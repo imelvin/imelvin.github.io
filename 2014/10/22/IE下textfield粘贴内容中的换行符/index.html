@@ -10,14 +10,7 @@
     <meta name="author" content="Elvin Guan">
     
     <meta name="description" content="对于将含有换行符的数据粘贴到单行的text输入框，不同浏览器有不同的行为。待粘贴内容，也就是测试源码日下
-   [html]
-Test
-
-不同浏览器的不同行为
-在Chrome下
-
-再复制出来的结果如下
-&amp;lt;html&amp;gt; &amp;lt;head&amp;gt; &amp;lt;title&amp;gt;Test&amp;lt;/t">
+12345678&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;title&amp;gt;Test&amp;lt;/title&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;&amp;lt;input">
     
     
     
@@ -100,34 +93,30 @@ Test
 		</div>
 		
 		<p>对于将含有换行符的数据粘贴到单行的text输入框，不同浏览器有不同的行为。<br>待粘贴内容，也就是测试源码日下</p>
-<p>   [html]</p>
-<html><br><head><br><title>Test</title><br></head><br><body><br><input type="text" id="testText"><br></body><br></html>
+<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">id</span>=<span class="value">"testText"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
 
 <h2 id="不同浏览器的不同行为">不同浏览器的不同行为</h2>
 <h4 id="在Chrome下">在Chrome下</h4>
 <p><img src="http://ww1.sinaimg.cn/large/79c63b39gw1eeu1jyeuz4j205k02sa9x.jpg" alt=""></p>
 <p>再复制出来的结果如下</p>
-<pre><code><span class="tag">&lt;<span class="title">html</span>&gt;</span> <span class="tag">&lt;<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span> <span class="tag">&lt;/<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">body</span>&gt;</span> <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> /&gt;</span> <span class="tag">&lt;/<span class="title">body</span>&gt;</span> <span class="tag">&lt;/<span class="title">html</span>&gt;</span>
-</code></pre><p>可以发现换行变成了空格</p>
+<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span> <span class="tag">&lt;<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span> <span class="tag">&lt;/<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">body</span>&gt;</span> <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> /&gt;</span> <span class="tag">&lt;/<span class="title">body</span>&gt;</span> <span class="tag">&lt;/<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>可以发现换行变成了空格</p>
 <h4 id="在FireFox下">在FireFox下</h4>
 <p><img src="http://ww2.sinaimg.cn/large/79c63b39gw1eeu1ns594tj207503pt8q.jpg" alt=""></p>
-<pre><code><span class="tag">&lt;<span class="title">html</span>&gt;</span> <span class="tag">&lt;<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span> <span class="tag">&lt;/<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">body</span>&gt;</span> <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> /&gt;</span> <span class="tag">&lt;/<span class="title">body</span>&gt;</span> <span class="tag">&lt;/<span class="title">html</span>&gt;</span>
-</code></pre><p>可以发现FireFox与Chrome行为一致</p>
+<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span> <span class="tag">&lt;<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span> <span class="tag">&lt;/<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">body</span>&gt;</span> <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> /&gt;</span> <span class="tag">&lt;/<span class="title">body</span>&gt;</span> <span class="tag">&lt;/<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>可以发现FireFox与Chrome行为一致</p>
 <h4 id="在IE下">在IE下</h4>
 <p><img src="http://ww2.sinaimg.cn/large/79c63b39gw1eeu1sfkfhwj207u03rjr9.jpg" alt=""></p>
 <p>复制出来的结果如下</p>
-<pre><code><span class="tag">&lt;<span class="title">html</span>&gt;</span>
-</code></pre><p>可以发现只有第一行数据</p>
-<h2 id="解决方法">解决方法</h2>
-<pre><code><span class="keyword">if</span> (<span class="built_in">window</span>.clipboardData) {
-    $(<span class="string">'#testText'</span>).bind(<span class="string">'paste'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(e)</span> </span>{
-        <span class="keyword">var</span> clipped = <span class="built_in">window</span>.clipboardData.getData(<span class="string">"text"</span>);
+<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
 
-        clipped = clipped.replace(<span class="regexp">/(\r\n|\n|\r)/gm</span>, <span class="string">" "</span>); <span class="comment">//replace newlines with spaces</span>
-        <span class="built_in">window</span>.clipboardData.setData(<span class="string">'text'</span>, clipped);
-    });
-}
-</code></pre>  
+<p>可以发现只有第一行数据</p>
+<h2 id="解决方法">解决方法</h2>
+<figure class="highlight [JavaScript]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (<span class="built_in">window</span>.clipboardData) {</div><div class="line">    $(<span class="string">'#testText'</span>).bind(<span class="string">'paste'</span>, <span class="function"><span class="keyword">function</span><span class="params">(e)</span> </span>{</div><div class="line">        <span class="keyword">var</span> clipped = <span class="built_in">window</span>.clipboardData.getData(<span class="string">"text"</span>);</div><div class="line"></div><div class="line">        clipped = clipped.replace(<span class="regexp">/(\r\n|\n|\r)/gm</span>, <span class="string">" "</span>); <span class="comment">//replace newlines with spaces</span></div><div class="line">        <span class="built_in">window</span>.clipboardData.setData(<span class="string">'text'</span>, clipped);</div><div class="line">    });</div><div class="line">}</div></pre></td></tr></table></figure>
+
+  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
