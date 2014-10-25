@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://elvin.im/"/>
-  <updated>2014-10-25T14:54:14.261Z</updated>
+  <updated>2014-10-25T15:00:09.747Z</updated>
   <id>http://elvin.im/</id>
   
   <author>
@@ -19,7 +19,7 @@
     <link href="http://elvin.im/2014/10/25/%E4%BD%BF%E7%94%A8Hexo%E5%9C%A8github%E6%90%AD%E5%BB%BA%E5%85%8D%E8%B4%B9%E5%8D%9A%E5%AE%A2/"/>
     <id>http://elvin.im/2014/10/25/使用Hexo在github搭建免费博客/</id>
     <published>2014-10-25T05:14:15.000Z</published>
-    <updated>2014-10-25T12:51:04.000Z</updated>
+    <updated>2014-10-25T15:00:02.000Z</updated>
     <content type="html"><![CDATA[<p>Hexo是一个基于NodeJS实现的博客框架，它可以解析由markdown写的文章并生成静态的HTML文件，而且可以更换不同的主题。<br>github pages可以免费托管静态页面，而且不限制流量，目前在国内访问还算稳定，是搭建博客的不错选择。</p>
 <h2 id="准备环境">准备环境</h2>
 <h3 id="注册github，创建仓库">注册github，创建仓库</h3>
@@ -115,7 +115,15 @@
 <p>编辑heme/jacman/layout/_widget/links.ejs修改相应的链接和现实文本，要增加记录可以新加li标签。</p>
 <figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"linkslist"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">p</span> <span class="attribute">class</span>=<span class="value">"asidetitle"</span>&gt;</span><span class="vbscript">&lt;%= __(<span class="comment">'links') %&gt;</span></span><span class="tag">&lt;/<span class="title">p</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">ul</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">li</span>&gt;</span><span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"http://wuchong.me"</span> <span class="attribute">target</span>=<span class="value">"_blank"</span> <span class="attribute">title</span>=<span class="value">"Cloud"</span>&gt;</span>Jark's Blog<span class="tag">&lt;/<span class="title">a</span>&gt;</span><span class="tag">&lt;/<span class="title">li</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">li</span>&gt;</span><span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"http://hexo.io"</span> <span class="attribute">target</span>=<span class="value">"_blank"</span> <span class="attribute">title</span>=<span class="value">"Hexo"</span>&gt;</span>Hexo<span class="tag">&lt;/<span class="title">a</span>&gt;</span><span class="tag">&lt;/<span class="title">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">ul</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">div</span>&gt;</span></div></pre></td></tr></table></figure>
 
-<p>参考链接：<br><a href="http://hexo.io" target="_blank" rel="external">http://hexo.io</a><br><a href="http://fy98.com/2014/03/03/build-blog-with-hexo" target="_blank" rel="external">http://fy98.com/2014/03/03/build-blog-with-hexo</a></p>
+<h3 id="添加RSS功能">添加RSS功能</h3>
+<p>hexo可以使用插件实现RSS功能，首先安装RSS插件到本地</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm <span class="operator"><span class="keyword">install</span> hexo-generator-feed</span></div></pre></td></tr></table></figure>
+
+<p>然后开启RSS功能，编辑_config.yml添加</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">plugin<span class="variable">s:</span></div><div class="line">- hexo-generator-feed</div></pre></td></tr></table></figure>
+
+<p>这样打开<a href="http://username.github.io/atom.xml" target="_blank" rel="external">http://username.github.io/atom.xml</a>应该就不是404了</p>
+<p>参考链接：<br><a href="http://hexo.io" target="_blank" rel="external">http://hexo.io</a><br><a href="http://fy98.com/2014/03/03/build-blog-with-hexo" target="_blank" rel="external">http://fy98.com/2014/03/03/build-blog-with-hexo</a><br><a href="http://zipperary.com/2013/06/02/hexo-guide-5/" target="_blank" rel="external">http://zipperary.com/2013/06/02/hexo-guide-5/</a></p>
 ]]></content>
     <summary type="html">
     <![CDATA[<p>Hexo是一个基于NodeJS实现的博客框架，它可以解析由markdown写的文章并生成静态的HTML文件，而且可以更换不同的主题。<br>github pages可以免费托管静态页面，而且不限制流量，目前在国内访问还算稳定，是搭建博客的不错选择。</p>
