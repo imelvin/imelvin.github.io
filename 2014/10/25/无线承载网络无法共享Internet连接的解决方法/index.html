@@ -4,13 +4,14 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>IE下textfield粘贴内容中的换行符 | Elvin Blog</title>
+    <title>无线承载网络无法共享Internet连接的解决方法 | Elvin Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Elvin Guan">
     
-    <meta name="description" content="对于将含有换行符的数据粘贴到单行的text输入框，不同浏览器有不同的行为。待粘贴内容，也就是测试源码日下
-12345678&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;title&amp;gt;Test&amp;lt;/title&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;&amp;lt;input">
+    <meta name="description" content="当没有无线路由器的时候怎么让Android手机通过家用宽带连接Internet呢？只要有一台笔记本或者是台式机+无线网卡。具体的做法如下：
+首先以管理员身份在CMD中运行如下命令：
+1netsh wlan set hostednetwork mode=allow ssid=xxx key=xxxxx">
     
     
     
@@ -71,14 +72,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2014/10/22/IE下textfield粘贴内容中的换行符/" title="IE下textfield粘贴内容中的换行符" itemprop="url">IE下textfield粘贴内容中的换行符</a>
+      <a href="/2014/10/25/无线承载网络无法共享Internet连接的解决方法/" title="无线承载网络无法共享Internet连接的解决方法" itemprop="url">无线承载网络无法共享Internet连接的解决方法</a>
   </h1>
   <p class="article-author">By
        
 		<a href="http://elvin.im/about" title="Elvin Guan" target="_blank" itemprop="author">Elvin Guan</a>
 		
   <p class="article-time">
-    <time datetime="2014-10-22T12:54:53.000Z" itemprop="datePublished"> 发表于 10月 22 2014</time>
+    <time datetime="2014-10-25T13:32:37.000Z" itemprop="datePublished"> 发表于 10月 25 2014</time>
     
   </p>
 </header>
@@ -88,34 +89,30 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#不同浏览器的不同行为"><span class="toc-number">1.</span> <span class="toc-text">不同浏览器的不同行为</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#在Chrome下"><span class="toc-number">1.1.</span> <span class="toc-text">在Chrome下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在FireFox下"><span class="toc-number">1.2.</span> <span class="toc-text">在FireFox下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在IE下"><span class="toc-number">1.3.</span> <span class="toc-text">在IE下</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解决方法"><span class="toc-number">2.</span> <span class="toc-text">解决方法</span></a></li></ol>
+			
 		
 		</div>
 		
-		<p>对于将含有换行符的数据粘贴到单行的text输入框，不同浏览器有不同的行为。<br>待粘贴内容，也就是测试源码日下</p>
-<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">id</span>=<span class="value">"testText"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
+		<p>当没有无线路由器的时候怎么让Android手机通过家用宽带连接Internet呢？只要有一台笔记本或者是台式机+无线网卡。具体的做法如下：</p>
+<p>首先以管理员身份在CMD中运行如下命令：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netsh wlan <span class="operator"><span class="keyword">set</span> hostednetwork <span class="keyword">mode</span>=allow ssid=xxx <span class="keyword">key</span>=xxxxxxxxxxxx</span></div></pre></td></tr></table></figure>
 
-<h2 id="不同浏览器的不同行为">不同浏览器的不同行为</h2>
-<h3 id="在Chrome下">在Chrome下</h3>
-<p><img src="http://ww1.sinaimg.cn/large/79c63b39gw1eeu1jyeuz4j205k02sa9x.jpg" alt=""></p>
-<p>再复制出来的结果如下</p>
-<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span> <span class="tag">&lt;<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span> <span class="tag">&lt;/<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">body</span>&gt;</span> <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> /&gt;</span> <span class="tag">&lt;/<span class="title">body</span>&gt;</span> <span class="tag">&lt;/<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>该命令启用了无线承载网络并将无线网络的SSID设置为xxx，密码设置为xxxxxxxxxxxxxx，此时会出现一个新的网络连接，我的机器是<strong>无线网络连接 2</strong>。此命令运行成功后将连接到Internet的网络连接的Internet连接共享到新出现的<strong>无线网络连接 2</strong>。截图如下：</p>
+<p><img src="http://elvin-blog.qiniudn.com/wlan-collection.jpg" alt=""></p>
+<p>最后开启该无线承载网络即可，命令如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netsh wlan <span class="operator"><span class="keyword">start</span> hostednetwork</span></div></pre></td></tr></table></figure>
 
-<p>可以发现换行变成了空格</p>
-<h3 id="在FireFox下">在FireFox下</h3>
-<p><img src="http://ww2.sinaimg.cn/large/79c63b39gw1eeu1ns594tj207503pt8q.jpg" alt=""></p>
-<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span> <span class="tag">&lt;<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span> <span class="tag">&lt;/<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">body</span>&gt;</span> <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> /&gt;</span> <span class="tag">&lt;/<span class="title">body</span>&gt;</span> <span class="tag">&lt;/<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
 
-<p>可以发现FireFox与Chrome行为一致</p>
-<h3 id="在IE下">在IE下</h3>
-<p><img src="http://ww2.sinaimg.cn/large/79c63b39gw1eeu1sfkfhwj207u03rjr9.jpg" alt=""></p>
-<p>复制出来的结果如下</p>
-<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
 
-<p>可以发现只有第一行数据</p>
-<h2 id="解决方法">解决方法</h2>
-<figure class="highlight [JavaScript]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (<span class="built_in">window</span>.clipboardData) {</div><div class="line">    $(<span class="string">'#testText'</span>).bind(<span class="string">'paste'</span>, <span class="function"><span class="keyword">function</span><span class="params">(e)</span> </span>{</div><div class="line">        <span class="keyword">var</span> clipped = <span class="built_in">window</span>.clipboardData.getData(<span class="string">"text"</span>);</div><div class="line"></div><div class="line">        clipped = clipped.replace(<span class="regexp">/(\r\n|\n|\r)/gm</span>, <span class="string">" "</span>); <span class="comment">//replace newlines with spaces</span></div><div class="line">        <span class="built_in">window</span>.clipboardData.setData(<span class="string">'text'</span>, clipped);</div><div class="line">    });</div><div class="line">}</div></pre></td></tr></table></figure>
+<p>此时手机应该已经可以正常连接到此无线网络并正常上网了。</p>
+<p>但在共享Internet连接的时候可能会出现如下错误：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">An <span class="keyword">error</span> occurred <span class="keyword">while</span> Internet Connection Sharing we being enabled.Internet Connection Sharing cannot be enabled. A LAN connection <span class="keyword">is</span> already configured <span class="keyword">with</span> <span class="keyword">the</span> IP address <span class="keyword">that</span> <span class="keyword">is</span> required <span class="keyword">for</span> automatic IP addressing.</div></pre></td></tr></table></figure>
 
+<p>此时可以通过如下两条命令修复：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">netsh int ip <span class="operator"><span class="keyword">reset</span> D:\resetlog.txt</span></div><div class="line">netsh winsock <span class="keyword">reset</span> <span class="keyword">catalog</span></div></pre></td></tr></table></figure>
+
+<p>用管理员权限执行完这两条命令以后重启，应该就可以正常共享Internet连接了。</p>
+<p>参考信息：<a href="http://www.makeuseof.com/answers/share-wireless-internet-connection-windows-7/" target="_blank" rel="external">http://www.makeuseof.com/answers/share-wireless-internet-connection-windows-7/</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -123,13 +120,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/浏览器兼容性/">浏览器兼容性</a>
+  <a class="article-category-link" href="/categories/Windows/">Windows</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/JS/">JS</a><a href="/tags/HTML/">HTML</a><a href="/tags/浏览器兼容性/">浏览器兼容性</a>
+  <span></span> <a href="/tags/无线网络共享-Windows/">无线网络共享 Windows</a>
   </div>
 
 </div>
@@ -137,7 +134,7 @@
 
 <div class="article-share" id="share">
 
-  <div data-url="http://elvin.im/2014/10/22/IE下textfield粘贴内容中的换行符/" data-title="IE下textfield粘贴内容中的换行符 | Elvin Blog" data-tsina="null" class="share clearfix">
+  <div data-url="http://elvin.im/2014/10/25/无线承载网络无法共享Internet连接的解决方法/" data-title="无线承载网络无法共享Internet连接的解决方法 | Elvin Blog" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -146,14 +143,14 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2014/10/23/JS闭包在ExtJS中的应用/" title="JS闭包在ExtJS中的应用">
-  <strong>上一篇：</strong><br/>
-  <span>
-  JS闭包在ExtJS中的应用</span>
+
+<div class="next">
+<a href="/2014/10/25/使用Hexo在github搭建免费博客/"  title="使用Hexo在github搭建免费博客">
+ <strong>下一篇：</strong><br/> 
+ <span>使用Hexo在github搭建免费博客
+</span>
 </a>
 </div>
-
 
 </nav>
 
@@ -169,7 +166,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#不同浏览器的不同行为"><span class="toc-number">1.</span> <span class="toc-text">不同浏览器的不同行为</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#在Chrome下"><span class="toc-number">1.1.</span> <span class="toc-text">在Chrome下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在FireFox下"><span class="toc-number">1.2.</span> <span class="toc-text">在FireFox下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在IE下"><span class="toc-number">1.3.</span> <span class="toc-text">在IE下</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解决方法"><span class="toc-number">2.</span> <span class="toc-text">解决方法</span></a></li></ol>
+ 
  
   </div>
 
