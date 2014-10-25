@@ -1,0 +1,428 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>快速排序算法 | Elvin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Elvin Guan">
+    
+    <meta name="description" content="快速排序算法是20世纪十大最伟大的算法之一。它是由C.R.A.Hoare于1962年提出的一种划分交换排序算法，其采用的是分治的思想，分治是将原问题分解成若干与原问题相似的子问题，通过递归的解决这些子问题来最终得出原问题的解。
+快速排序是通过一个划分（SPLIT）算法来将待排序序列划分成两部分，其中">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="Elvin Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Elvin Blog" title="Elvin Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Elvin Blog">Elvin Blog</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:elvin.im">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2012/03/07/快速排序算法实现/" title="快速排序算法" itemprop="url">快速排序算法</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://elvin.im/about" title="Elvin Guan" target="_blank" itemprop="author">Elvin Guan</a>
+		
+  <p class="article-time">
+    <time datetime="2012-03-07T13:53:22.000Z" itemprop="datePublished"> 发表于 3月 7 2012</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			
+		
+		</div>
+		
+		<p>快速排序算法是20世纪十大最伟大的算法之一。它是由C.R.A.Hoare于1962年提出的一种划分交换排序算法，其采用的是分治的思想，分治是将原问题分解成若干与原问题相似的子问题，通过递归的解决这些子问题来最终得出原问题的解。</p>
+<p>快速排序是通过一个划分（SPLIT）算法来将待排序序列划分成两部分，其中左边的元素都小于中间的元素，右边的元素都小于中间的元素。然后通过对子数组进行递归划分就可以完成对整个序列的排序。所以划分（SPLIT）算法是快速排序的核心，它的伪代码如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//算法：SPLIT</span></div><div class="line"><span class="comment">//输入：数组A[low...high]</span></div><div class="line"><span class="comment">//输出：1）重新排列的A；2）划分元素A[low]的新位置w；</span></div><div class="line"></div><div class="line">i ← low  </div><div class="line">x ← A[low]  </div><div class="line"><span class="keyword">for</span> j ← low+<span class="number">1</span> <span class="keyword">to</span> high:  </div><div class="line">    <span class="keyword">if</span> A[j] &lt;= x <span class="keyword">then</span>:  </div><div class="line">        i ← i+<span class="number">1</span>  </div><div class="line">        <span class="keyword">if</span> i != j <span class="keyword">then</span> 互换A[i]和A[j]  </div><div class="line">        <span class="keyword">end</span> <span class="keyword">if</span>  </div><div class="line">    <span class="keyword">end</span> <span class="keyword">if</span>  </div><div class="line"><span class="keyword">end</span> <span class="keyword">for</span>  </div><div class="line">互换A[low]和A[i]  </div><div class="line">w ← i  </div><div class="line"><span class="keyword">return</span> A和w</div></pre></td></tr></table></figure>
+
+<p>快速排序很容易用递归的方式实现，递归方式的伪代码如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//算法：QUICKSORT</span></div><div class="line"><span class="comment">//输入：n个元素的数组A[1...n]</span></div><div class="line"><span class="comment">//输出：按非降序排列的数组A中的元素</span></div><div class="line"><span class="comment">//quicksort(A, 1, n)</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> low &lt; high <span class="keyword">then</span>  </div><div class="line">    SPLIT(A[low...high], w)  </div><div class="line">    quicksort(A, low, w-<span class="number">1</span>)  </div><div class="line">    quicksort(A, w+<span class="number">1</span>, high)  </div><div class="line"><span class="keyword">end</span> <span class="keyword">if</span></div></pre></td></tr></table></figure>
+
+<p>快速排序也可以用迭代的方式实现，迭代方式伪代码如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//算法：QUICKSORT</span></div><div class="line"><span class="comment">//输入：n个元素的数组A[1...n]</span></div><div class="line"><span class="comment">//输出：按非降序排列的数组A中的元素</span></div><div class="line"><span class="comment">//quicksort(A, 1, n)</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> low &gt;= high <span class="keyword">then</span>   </div><div class="line">    <span class="keyword">return</span>  </div><div class="line"><span class="keyword">end</span> <span class="keyword">if</span>  </div><div class="line">  </div><div class="line">low 进栈  </div><div class="line">high 进栈  </div><div class="line"><span class="keyword">while</span> 栈不为空:  </div><div class="line">    high = 栈顶（出栈）  </div><div class="line">    low = 栈顶（出栈）  </div><div class="line">    w = SPLIT(A, low, high)  </div><div class="line">    <span class="keyword">if</span> low &lt; w-<span class="number">1</span> <span class="keyword">then</span>:  </div><div class="line">        low 进栈  </div><div class="line">        w-<span class="number">1</span> 进栈  </div><div class="line">    <span class="keyword">end</span> <span class="keyword">if</span>  </div><div class="line">    <span class="keyword">if</span> high &gt; w+<span class="number">1</span> <span class="keyword">then</span>:  </div><div class="line">        w+<span class="number">1</span> 进栈  </div><div class="line">        high 进栈  </div><div class="line">    <span class="keyword">end</span> <span class="keyword">if</span>  </div><div class="line"><span class="keyword">end</span> <span class="keyword">while</span></div></pre></td></tr></table></figure>
+
+<p>在这里只实现快速排序的迭代方式实现，C++代码实现的快排如下：</p>
+<figure class="highlight [CPP]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;iostream&gt;  </span></div><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;stack&gt;  </span></div><div class="line"><span class="preprocessor">#<span class="keyword">define</span> Type int  </span></div><div class="line">  </div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;  </div><div class="line">  </div><div class="line"><span class="keyword">int</span> Split(Type * a, <span class="keyword">int</span> low, <span class="keyword">int</span> high) {  </div><div class="line">    <span class="keyword">int</span> i = low;  </div><div class="line">    <span class="keyword">int</span> x = a[low];  </div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = low+<span class="number">1</span>; j &lt;= high; j++) {  </div><div class="line">        <span class="keyword">if</span> (a[j] &lt;= x) {  </div><div class="line">            i ++;  </div><div class="line">            <span class="keyword">if</span> (i != j) {  </div><div class="line">                Type temp = a[i];  </div><div class="line">                a[i] = a[j];  </div><div class="line">                a[j] = temp;  </div><div class="line">            }  </div><div class="line">        }  </div><div class="line">    }  </div><div class="line">    Type temp = a[low];  </div><div class="line">    a[low] = a[i];  </div><div class="line">    a[i] = temp;  </div><div class="line">      </div><div class="line">    <span class="keyword">return</span> i;  </div><div class="line">}  </div><div class="line">  </div><div class="line"><span class="keyword">void</span> QuickSort(Type * a, <span class="keyword">int</span> low, <span class="keyword">int</span> high) {  </div><div class="line">    <span class="keyword">if</span> (low &gt;= high) {  </div><div class="line">        <span class="keyword">return</span>;  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    <span class="stl_container"><span class="built_in">stack</span>&lt;<span class="keyword">int</span>&gt;</span> range;  </div><div class="line">    range.push(low);  </div><div class="line">    range.push(high);  </div><div class="line">    <span class="keyword">while</span>(!range.empty()) {  </div><div class="line">        high = range.top();  </div><div class="line">        range.pop();  </div><div class="line">        low = range.top();  </div><div class="line">        range.pop();  </div><div class="line">          </div><div class="line">        <span class="keyword">int</span> w = Split(a, low, high);  </div><div class="line">          </div><div class="line">        <span class="keyword">if</span> (low &lt; w-<span class="number">1</span>) {  </div><div class="line">            range.push(low);  </div><div class="line">            range.push(w-<span class="number">1</span>);  </div><div class="line">        }  </div><div class="line">        <span class="keyword">if</span> (high &gt; w+<span class="number">1</span>) {  </div><div class="line">            range.push(w+<span class="number">1</span>);  </div><div class="line">            range.push(high);  </div><div class="line">        }  </div><div class="line">    }  </div><div class="line">}  </div><div class="line">  </div><div class="line"><span class="keyword">int</span> main(<span class="keyword">void</span>) {  </div><div class="line">    Type a[<span class="number">20</span>] = {<span class="number">2</span>, <span class="number">3</span>, <span class="number">12</span>, <span class="number">18</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">14</span>, <span class="number">12</span>, <span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">17</span>, <span class="number">15</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span>, <span class="number">13</span> ,<span class="number">3</span>};  </div><div class="line">      </div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前：\n"</span>;  </div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">20</span>; i ++) {  </div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i] &lt;&lt; <span class="string">"  "</span>;  </div><div class="line">    }   </div><div class="line">    <span class="built_in">cout</span> &lt;&lt; endl;  </div><div class="line">      </div><div class="line">    QuickSort(a, <span class="number">0</span>, <span class="number">19</span>);  </div><div class="line">      </div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"迭代版快速排序后：\n"</span>;  </div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">20</span>; i ++) {  </div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i] &lt;&lt; <span class="string">"  "</span>;  </div><div class="line">    }   </div><div class="line">    <span class="built_in">cout</span> &lt;&lt; endl;  </div><div class="line">      </div><div class="line">    getchar();  </div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;  </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>Java版本：</p>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> sort;  </div><div class="line">  </div><div class="line"><span class="keyword">import</span> java.util.Stack;  </div><div class="line">  </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuickSort</span> </span>{  </div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> [] array = <span class="keyword">null</span>;  </div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> sorted = <span class="keyword">false</span>;  </div><div class="line">      </div><div class="line">    <span class="keyword">public</span> <span class="title">QuickSort</span>(<span class="keyword">int</span> [] a) {  </div><div class="line">        <span class="keyword">this</span>.array = <span class="keyword">new</span> <span class="keyword">int</span> [a.length];  </div><div class="line">        System.arraycopy(a, <span class="number">0</span>, <span class="keyword">this</span>.array, <span class="number">0</span>, a.length);  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> <span class="title">split</span>(<span class="keyword">int</span> low, <span class="keyword">int</span> high) {  </div><div class="line">        <span class="keyword">int</span> i = low;    </div><div class="line">        <span class="keyword">int</span> x = array[low];    </div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = low+<span class="number">1</span>; j &lt;= high; j++) {    </div><div class="line">            <span class="keyword">if</span> (array[j] &lt;= x) {    </div><div class="line">                i ++;    </div><div class="line">                <span class="keyword">if</span> (i != j) {    </div><div class="line">                    <span class="keyword">int</span> temp = array[i];    </div><div class="line">                    array[i] = array[j];    </div><div class="line">                    array[j] = temp;    </div><div class="line">                }    </div><div class="line">            }    </div><div class="line">        }    </div><div class="line">        <span class="keyword">int</span> temp = array[low];    </div><div class="line">        array[low] = array[i];    </div><div class="line">        array[i] = temp;    </div><div class="line">            </div><div class="line">        <span class="keyword">return</span> i;  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title">quickSort</span>() {  </div><div class="line">        <span class="keyword">if</span> (array.length &lt;= <span class="number">1</span>) {  </div><div class="line">            sorted = <span class="keyword">true</span>;  </div><div class="line">            <span class="keyword">return</span>;  </div><div class="line">        }  </div><div class="line">          </div><div class="line">        <span class="keyword">int</span> low = <span class="number">0</span>, high = array.length-<span class="number">1</span>;  </div><div class="line">        Stack&lt;Integer&gt; range = <span class="keyword">new</span> Stack&lt;Integer&gt;();  </div><div class="line">        range.push(low);  </div><div class="line">        range.push(high);  </div><div class="line">        <span class="keyword">while</span> (!range.empty()) {  </div><div class="line">            high = range.pop();  </div><div class="line">            low = range.pop();  </div><div class="line">              </div><div class="line">            <span class="keyword">int</span> w = split(low, high);  </div><div class="line">              </div><div class="line">            <span class="keyword">if</span> (low &lt; w-<span class="number">1</span>) {  </div><div class="line">                range.push(low);  </div><div class="line">                range.push(w-<span class="number">1</span>);  </div><div class="line">            }  </div><div class="line">            <span class="keyword">if</span> (high &gt; w+<span class="number">1</span>) {    </div><div class="line">                range.push(w+<span class="number">1</span>);    </div><div class="line">                range.push(high);    </div><div class="line">            }    </div><div class="line">        }  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> [] <span class="title">getSortedIntArray</span>() {  </div><div class="line">        <span class="keyword">if</span> (!sorted) {  </div><div class="line">            quickSort();  </div><div class="line">        }  </div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.array;  </div><div class="line">    }  </div><div class="line">  </div><div class="line">    <span class="javadoc">/** </span></div><div class="line">     *<span class="javadoctag"> @param</span> args </div><div class="line">     */  </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {  </div><div class="line">        <span class="comment">// TODO Auto-generated method stub  </span></div><div class="line">        <span class="keyword">int</span> [] a = {<span class="number">2</span>, <span class="number">3</span>, <span class="number">12</span>, <span class="number">18</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">14</span>, <span class="number">12</span>, <span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">17</span>, <span class="number">15</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span>, <span class="number">13</span> ,<span class="number">3</span>};   </div><div class="line">          </div><div class="line">        System.out.println(<span class="string">"排序前："</span>);  </div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; <span class="number">20</span>; i ++) {  </div><div class="line">            System.out.print(a[i] + <span class="string">"  "</span>);  </div><div class="line">        }  </div><div class="line">          </div><div class="line">        QuickSort qs = <span class="keyword">new</span> QuickSort(a);  </div><div class="line">        a = qs.getSortedIntArray();  </div><div class="line">          </div><div class="line">        System.out.println(<span class="string">"迭代版快速排序后："</span>);  </div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; <span class="number">20</span>; i ++) {  </div><div class="line">            System.out.print(a[i] + <span class="string">"  "</span>);  </div><div class="line">        }  </div><div class="line">    }  </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>Python版本:</p>
+<figure class="highlight [Python]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! /usr/bin/env python  </span></div><div class="line"><span class="comment"># -*- coding:utf-8 -*-  </span></div><div class="line">  </div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">split</span><span class="params">(array, low, high)</span>:</span>  </div><div class="line">    i = low  </div><div class="line">    x = array[low]  </div><div class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(low+<span class="number">1</span>, high+<span class="number">1</span>):  </div><div class="line">        <span class="keyword">if</span> array[j] &lt;= x:  </div><div class="line">            i = i+<span class="number">1</span>  </div><div class="line">            <span class="keyword">if</span> i != j:  </div><div class="line">                temp = array[i]  </div><div class="line">                array[i] = array[j]  </div><div class="line">                array[j] = temp  </div><div class="line">    temp = array[low]  </div><div class="line">    array[low] = array[i]  </div><div class="line">    array[i] = temp  </div><div class="line">  </div><div class="line">    <span class="keyword">return</span> i  </div><div class="line">  </div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">quickSort</span><span class="params">(array, low, high)</span>:</span>  </div><div class="line">    <span class="keyword">if</span> low &gt;= high:  </div><div class="line">        <span class="keyword">return</span>  </div><div class="line">  </div><div class="line">    stack_range = list()  </div><div class="line">    stack_range.append(low)  </div><div class="line">    stack_range.append(high)  </div><div class="line">    <span class="keyword">while</span> len(stack_range) != <span class="number">0</span>:  </div><div class="line">        high = stack_range.pop()  </div><div class="line">        low = stack_range.pop()  </div><div class="line">  </div><div class="line">        w = split(array, low, high)  </div><div class="line">  </div><div class="line">        <span class="keyword">if</span> low &lt; w-<span class="number">1</span>:  </div><div class="line">            stack_range.append(low)  </div><div class="line">            stack_range.append(w-<span class="number">1</span>)  </div><div class="line">        <span class="keyword">if</span> high &gt; w+<span class="number">1</span>:  </div><div class="line">            stack_range.append(w+<span class="number">1</span>)  </div><div class="line">            stack_range.append(high)  </div><div class="line">  </div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:  </div><div class="line">    a = [<span class="number">2</span>, <span class="number">3</span>, <span class="number">12</span>, <span class="number">18</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">14</span>, <span class="number">12</span>, <span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">17</span>, <span class="number">15</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span>, <span class="number">13</span> ,<span class="number">3</span>]  </div><div class="line">  </div><div class="line">    <span class="keyword">print</span> <span class="string">'排序前：'</span>  </div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> a:  </div><div class="line">        <span class="keyword">print</span> i,  </div><div class="line">    <span class="keyword">print</span>  </div><div class="line">  </div><div class="line">    quickSort(a, <span class="number">0</span>, len(a)-<span class="number">1</span>)  </div><div class="line">  </div><div class="line">    <span class="keyword">print</span> <span class="string">'迭代排序后：'</span>  </div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> a:  </div><div class="line">        <span class="keyword">print</span> i,</div></pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法实现/">算法实现</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/快速排序/">快速排序</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://elvin.im/2012/03/07/快速排序算法实现/" data-title="快速排序算法 | Elvin Blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2012/03/10/无线承载网络无法共享Internet连接的解决方法/" title="无线承载网络无法共享Internet连接的解决方法">
+  <strong>上一篇：</strong><br/>
+  <span>
+  无线承载网络无法共享Internet连接的解决方法</span>
+</a>
+</div>
+
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ 
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Windows/" title="Windows">Windows<sup>1</sup></a></li>
+		
+			<li><a href="/categories/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/categories/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/categories/算法实现/" title="算法实现">算法实现<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/快速排序/" title="快速排序">快速排序<sup>1</sup></a></li>
+		
+			<li><a href="/tags/无线网络共享-Windows/" title="无线网络共享 Windows">无线网络共享 Windows<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hexo-github/" title="Hexo github">Hexo github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JavaScript-闭包-ExtJS/" title="JavaScript 闭包 ExtJS">JavaScript 闭包 ExtJS<sup>1</sup></a></li>
+		
+			<li><a href="/tags/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/tags/HTML/" title="HTML">HTML<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JS/" title="JS">JS<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><a href="http://leorz.com" target="_blank" title="Leo">Leo's Blog</a></li>
+      <li><a href="http://hexo.io" target="_blank" title="Hexo">Hexo</a></li>
+    </ul>
+</div>
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2014 
+		
+		<a href="http://elvin.im/about" target="_blank" title="Elvin Guan">Elvin Guan</a>
+		
+		</p>
+</div>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F9cc4c1668f1879156c0627818f4e84ae' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"elvin-blog"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>
