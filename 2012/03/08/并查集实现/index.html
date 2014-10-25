@@ -1,0 +1,437 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>并查集实现 | Elvin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Elvin Guan">
+    
+    <meta name="description" content="并查集是一种树形的数据结构，用于处理一些不相交集合的合并及查询问题。常常在使用中以森林来表示。判断亲戚关系是并查集的一个应用：若某个家族过于庞大，要判断两个人是否是亲戚，现在给出某个亲戚关系图，求任意给出的两个人是否具有亲戚关系；规定x和y是亲戚，y和z是亲戚，那么x和z也是亲戚；如果x,y是亲戚，">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="Elvin Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Elvin Blog" title="Elvin Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Elvin Blog">Elvin Blog</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:elvin.im">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2012/03/08/并查集实现/" title="并查集实现" itemprop="url">并查集实现</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://elvin.im/about" title="Elvin Guan" target="_blank" itemprop="author">Elvin Guan</a>
+		
+  <p class="article-time">
+    <time datetime="2012-03-08T14:07:53.000Z" itemprop="datePublished"> 发表于 3月 8 2012</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			
+		
+		</div>
+		
+		<p>并查集是一种树形的数据结构，用于处理一些不相交集合的合并及查询问题。常常在使用中以森林来表示。判断亲戚关系是并查集的一个应用：若某个家族过于庞大，要判断两个人是否是亲戚，现在给出某个亲戚关系图，求任意给出的两个人是否具有亲戚关系；规定x和y是亲戚，y和z是亲戚，那么x和z也是亲戚；如果x,y是亲戚，那么x的亲戚都是y的亲戚，y的亲戚也都是x的亲戚。</p>
+<p>并查集可以表示成如下图所示的数据结构：</p>
+<p><img src="http://elvin-blog.qiniudn.com/union-set.jpg" alt=""></p>
+<p>实现并查集的核心算法是查找（FIND）和合并（UNION）。查找算法是递归的查找某节点的父节点直到找到根节点为止，而合并算法是将两棵树合并为一棵树。在这个过程中有一个明显的缺点，合并的时候在极端情况下可能会造成树的高度过高，而导致查找时效率过低。对于此，可以对查找和合并进行优化，采用按秩（rank）合并，和带路径压缩的查找。</p>
+<p>下面是带路径压缩的查找算法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">算法：FIND</div><div class="line">输入：节点x</div><div class="line">输出：root(x)，包含x的树的根</div><div class="line"></div><div class="line">y ← x  </div><div class="line"><span class="keyword">while</span> p(y) != <span class="keyword">null</span>  </div><div class="line">    y ← p(y)  </div><div class="line"><span class="keyword">end</span> <span class="keyword">while</span>  </div><div class="line">root ← y  </div><div class="line">y ← x  </div><div class="line"><span class="keyword">while</span> p(y) != <span class="keyword">null</span>  </div><div class="line">    w ← p(y)  </div><div class="line">    p(y) ← root  </div><div class="line">    y ← w  </div><div class="line"><span class="keyword">end</span> <span class="keyword">while</span>  </div><div class="line"><span class="keyword">return</span> root</div></pre></td></tr></table></figure>
+
+<p>下面是按秩（rank）合并的合并算法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">算法：<span class="keyword">UNION</span></div><div class="line">输入：两个元素x和y</div><div class="line">输出：包含x和y的两个树的合并，原来的树被破坏</div><div class="line"></div><div class="line">u ← FIND(x)  </div><div class="line">v ← FIND(y)  </div><div class="line"><span class="keyword">if</span> rank(u) &lt;= rank(v) <span class="keyword">then</span>  </div><div class="line">    p(u) ← v  </div><div class="line">    <span class="keyword">if</span> rank(u) == rank(v) <span class="keyword">then</span>  </div><div class="line">        rank(v) ← rank(v) + <span class="number">1</span>  </div><div class="line"><span class="keyword">else</span> p(v) ← u  </div><div class="line"><span class="keyword">end</span> <span class="keyword">if</span></div></pre></td></tr></table></figure>
+
+<p>下面是C++的实现：</p>
+<figure class="highlight [CPP]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;iostream&gt;  </span></div><div class="line"><span class="preprocessor">#<span class="keyword">define</span> Type Set  </span></div><div class="line">  </div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;  </div><div class="line">  </div><div class="line"><span class="keyword">struct</span> Set {  </div><div class="line">    <span class="keyword">int</span> parent;  </div><div class="line">    <span class="keyword">int</span> rank;  </div><div class="line">};  </div><div class="line">  </div><div class="line">  </div><div class="line"><span class="keyword">int</span> Find(Type *a, <span class="keyword">int</span> x) {  </div><div class="line">    <span class="keyword">int</span> y = x;  </div><div class="line">    <span class="keyword">while</span>(a[y].parent != <span class="number">0</span>) {  </div><div class="line">       y = a[y].parent;  </div><div class="line">    }  </div><div class="line">    <span class="keyword">int</span> root = y;  </div><div class="line">    y = x;   </div><div class="line">    <span class="keyword">while</span>(a[y].parent != <span class="number">0</span>) {  </div><div class="line">        <span class="keyword">int</span> w = a[y].parent;  </div><div class="line">        a[y].parent = root;  </div><div class="line">        y = w;  </div><div class="line">    }  </div><div class="line">    <span class="keyword">return</span> root;  </div><div class="line">}  </div><div class="line">  </div><div class="line"><span class="keyword">void</span> Union(Type *a, <span class="keyword">int</span> x, <span class="keyword">int</span> y) {  </div><div class="line">    <span class="keyword">int</span> u = Find(a, x);  </div><div class="line">    <span class="keyword">int</span> v = Find(a, y);  </div><div class="line">    <span class="keyword">if</span>(a[u].rank &lt;= a[v].rank) {  </div><div class="line">        a[u].parent = v;  </div><div class="line">        <span class="keyword">if</span>(a[u].rank == a[v].rank) {  </div><div class="line">            a[v].rank ++;  </div><div class="line">        }  </div><div class="line">    } <span class="keyword">else</span> {  </div><div class="line">        a[v].parent = u;  </div><div class="line">    }  </div><div class="line">}  </div><div class="line">  </div><div class="line"><span class="keyword">void</span> Initialize(Type *a, <span class="keyword">int</span> n) {     </div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n;i ++) {  </div><div class="line">        a[i].parent = <span class="number">0</span>;  </div><div class="line">        a[i].rank = <span class="number">0</span>;  </div><div class="line">    }  </div><div class="line">}    </div><div class="line">  </div><div class="line"><span class="keyword">void</span> Show(Type *a, <span class="keyword">int</span> n) {  </div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n;i ++) {  </div><div class="line">        <span class="built_in">cout</span> &lt;&lt; i &lt;&lt; <span class="string">"  -&gt;  "</span> &lt;&lt; a[i].parent &lt;&lt; <span class="string">"   rank:  "</span> &lt;&lt; a[i].rank &lt;&lt; endl;  </div><div class="line">    }  </div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"----------------------------------------\n"</span>;  </div><div class="line">}  </div><div class="line">  </div><div class="line"><span class="keyword">int</span> main() {  </div><div class="line">    Type S[<span class="number">10</span>];  </div><div class="line">    Initialize(S, <span class="number">9</span>);  </div><div class="line">      </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">    Union(S, <span class="number">1</span>, <span class="number">2</span>);  </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">    Union(S, <span class="number">3</span>, <span class="number">4</span>);  </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">    Union(S, <span class="number">5</span>, <span class="number">6</span>);  </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">    Union(S, <span class="number">7</span>, <span class="number">8</span>);  </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">    Union(S, <span class="number">2</span>, <span class="number">4</span>);  </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">    Union(S, <span class="number">8</span>, <span class="number">9</span>);  </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">    Union(S, <span class="number">6</span>, <span class="number">8</span>);  </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">    Find(S, <span class="number">5</span>);  </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">    Union(S, <span class="number">4</span>, <span class="number">8</span>);  </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">    Find(S, <span class="number">1</span>);  </div><div class="line">    Show(S, <span class="number">9</span>);  </div><div class="line">      </div><div class="line">    getchar();  </div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;  </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>然后是Java实现：</p>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> java.util.ArrayList;  </div><div class="line"><span class="keyword">import</span> java.util.HashMap;  </div><div class="line">  </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DisjointSet</span> </span>{  </div><div class="line">    <span class="keyword">private</span> ArrayList&lt;Integer&gt; parent = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();  </div><div class="line">    <span class="keyword">private</span> ArrayList&lt;Integer&gt; rank = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();  </div><div class="line">    <span class="comment">//private ArrayList&lt;String&gt; content = new ArrayList&lt;String&gt;();  </span></div><div class="line">    <span class="keyword">private</span> HashMap&lt;String, Integer&gt; content = <span class="keyword">new</span> HashMap&lt;String, Integer&gt;();  </div><div class="line">      </div><div class="line">    <span class="javadoc">/** </span></div><div class="line">     * 初始化哈函数 </div><div class="line">     *<span class="javadoctag"> @param</span> contents 所有的元素 </div><div class="line">     */  </div><div class="line">    <span class="keyword">public</span> <span class="title">DisjointSet</span>(ArrayList&lt;String&gt; contents) {  </div><div class="line">          </div><div class="line">        <span class="comment">//将第0个元素置0，使集合从1号元素开始  </span></div><div class="line">        <span class="keyword">this</span>.parent.clear();  </div><div class="line">        <span class="keyword">this</span>.rank.clear();  </div><div class="line">        <span class="keyword">this</span>.parent.add(<span class="number">0</span>);  </div><div class="line">        <span class="keyword">this</span>.rank.add(<span class="number">0</span>);  </div><div class="line">          </div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; contents.size(); i ++) {  </div><div class="line">            <span class="keyword">this</span>.parent.add(<span class="number">0</span>);  </div><div class="line">            <span class="keyword">this</span>.rank.add(<span class="number">0</span>);  </div><div class="line">            <span class="keyword">this</span>.content.put(contents.get(i), <span class="keyword">this</span>.parent.size()-<span class="number">1</span>);  </div><div class="line">        }  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title">union</span>(<span class="keyword">int</span> x, <span class="keyword">int</span> y) {  </div><div class="line">        <span class="keyword">int</span> u = <span class="keyword">this</span>.find(x);  </div><div class="line">        <span class="keyword">int</span> v = <span class="keyword">this</span>.find(y);  </div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.rank.get(u) &lt;= <span class="keyword">this</span>.rank.get(v)) {  </div><div class="line">            <span class="keyword">this</span>.parent.set(u, v);  </div><div class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.rank.get(u) == <span class="keyword">this</span>.rank.get(v)) {  </div><div class="line">                <span class="keyword">this</span>.rank.set(v, <span class="keyword">this</span>.rank.get(v)+<span class="number">1</span>);  </div><div class="line">            }  </div><div class="line">        } <span class="keyword">else</span> {  </div><div class="line">            <span class="keyword">this</span>.parent.set(v, u);  </div><div class="line">        }  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> <span class="title">find</span>(<span class="keyword">int</span> x) {  </div><div class="line">        <span class="keyword">int</span> y = x;  </div><div class="line">        <span class="keyword">while</span> (<span class="keyword">this</span>.parent.get(y) != <span class="number">0</span>) {  </div><div class="line">            y = <span class="keyword">this</span>.parent.get(y);  </div><div class="line">        }  </div><div class="line">        <span class="keyword">int</span> root = y;  </div><div class="line">        y = x;  </div><div class="line">        <span class="keyword">while</span> (<span class="keyword">this</span>.parent.get(y) != <span class="number">0</span>) {  </div><div class="line">            <span class="keyword">int</span> w = <span class="keyword">this</span>.parent.get(y);  </div><div class="line">            <span class="keyword">this</span>.parent.set(y, root);  </div><div class="line">            y = w;  </div><div class="line">        }  </div><div class="line">          </div><div class="line">        <span class="keyword">return</span> root;  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    <span class="javadoc">/** </span></div><div class="line">     * 判断a和b是否属于一个集合 </div><div class="line">     *<span class="javadoctag"> @param</span> a  </div><div class="line">     *<span class="javadoctag"> @param</span> b </div><div class="line">     *<span class="javadoctag"> @return</span> 若a和b均是集合元素且属于同一个集合，则返回true，否则返回false </div><div class="line">     */  </div><div class="line">    <span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSameSet</span>(String a, String b) {  </div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.content.containsKey(a) != <span class="keyword">true</span> || <span class="keyword">this</span>.content.containsKey(b) != <span class="keyword">true</span>) {  </div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;  </div><div class="line">        }  </div><div class="line">        <span class="keyword">int</span> u = <span class="keyword">this</span>.find(<span class="keyword">this</span>.content.get(a));  </div><div class="line">        <span class="keyword">int</span> v = <span class="keyword">this</span>.find(<span class="keyword">this</span>.content.get(b));  </div><div class="line">          </div><div class="line">        <span class="keyword">return</span> u == v;  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    <span class="javadoc">/** </span></div><div class="line">     * 将a和b合并成一个集合 </div><div class="line">     *<span class="javadoctag"> @param</span> a </div><div class="line">     *<span class="javadoctag"> @param</span> b </div><div class="line">     */  </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">join</span>(String a, String b) {  </div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.content.containsKey(a) != <span class="keyword">true</span> || <span class="keyword">this</span>.content.containsKey(b) != <span class="keyword">true</span>) {  </div><div class="line">            <span class="keyword">return</span>;  </div><div class="line">        }  </div><div class="line">          </div><div class="line">        <span class="keyword">this</span>.union(<span class="keyword">this</span>.content.get(a), <span class="keyword">this</span>.content.get(b));  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    <span class="javadoc">/** </span></div><div class="line">     * 添加新的集合元素 </div><div class="line">     *<span class="javadoctag"> @param</span> a </div><div class="line">     */  </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span>(String a) {  </div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.content.containsKey(a)) {  </div><div class="line">            <span class="keyword">return</span>;  </div><div class="line">        }  </div><div class="line">        <span class="keyword">this</span>.parent.add(<span class="number">0</span>);  </div><div class="line">        <span class="keyword">this</span>.rank.add(<span class="number">0</span>);  </div><div class="line">        <span class="keyword">this</span>.content.put(a, <span class="keyword">this</span>.parent.size()-<span class="number">1</span>);  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    <span class="javadoc">/** </span></div><div class="line">     *<span class="javadoctag"> @param</span> args </div><div class="line">     */  </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {  </div><div class="line">        <span class="comment">// TODO Auto-generated method stub  </span></div><div class="line">        System.out.println(<span class="string">"假设Sheldon、Amy和Raj属于一个集合，Howard和Bernadette属于一个集合，Leonard和Penny属于一个集合"</span>);  </div><div class="line">        String [] names = {<span class="string">"Sheldon"</span>, <span class="string">"Amy"</span>, <span class="string">"Raj"</span>, <span class="string">"Howard"</span>, <span class="string">"Bernadette"</span>, <span class="string">"Leonard"</span>, <span class="string">"Penny"</span>};  </div><div class="line">        ArrayList&lt;String&gt; set = <span class="keyword">new</span> ArrayList&lt;String&gt;();  </div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; names.length; i++) {  </div><div class="line">            set.add(names[i]);  </div><div class="line">        }  </div><div class="line">        DisjointSet ds = <span class="keyword">new</span> DisjointSet(set);  </div><div class="line">        ds.join(<span class="string">"Sheldon"</span>, <span class="string">"Amy"</span>);  </div><div class="line">        ds.join(<span class="string">"Amy"</span>, <span class="string">"Raj"</span>);  </div><div class="line">        ds.join(<span class="string">"Howard"</span>, <span class="string">"Bernadette"</span>);  </div><div class="line">        ds.join(<span class="string">"Leonard"</span>, <span class="string">"Penny"</span>);  </div><div class="line">          </div><div class="line">        System.out.print(<span class="string">"Sheldon和Raj属于一个集合吗？ "</span>);  </div><div class="line">        System.out.println(ds.isSameSet(<span class="string">"Sheldon"</span>, <span class="string">"Raj"</span>));  </div><div class="line">          </div><div class="line">        System.out.print(<span class="string">"Howard和Penny属于一个集合吗？ "</span>);  </div><div class="line">        System.out.println(ds.isSameSet(<span class="string">"Howard"</span>, <span class="string">"Penny"</span>));  </div><div class="line">    }  </div><div class="line">  </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>最后是Python版本：</p>
+<figure class="highlight [Python]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! /usr/bin/env python  </span></div><div class="line"><span class="comment"># -*- coding:utf-8 -*-  </span></div><div class="line">  </div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">DisjointSet</span>:</span>  </div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, contents)</span>:</span>  </div><div class="line">        self.parent = [<span class="number">0</span>]  </div><div class="line">        self.rank = [<span class="number">0</span>]  </div><div class="line">        self.content = dict()  </div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> contents:  </div><div class="line">            self.parent.append(<span class="number">0</span>)  </div><div class="line">            self.rank.append(<span class="number">0</span>)  </div><div class="line">            self.content[i] = len(self.parent)-<span class="number">1</span>  </div><div class="line">  </div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">union</span><span class="params">(self, x, y)</span>:</span>  </div><div class="line">        u = self.find(x)  </div><div class="line">        v = self.find(y)  </div><div class="line">        <span class="keyword">if</span> self.rank[u] &lt;= self.rank[v]:  </div><div class="line">            self.parent[u] = v  </div><div class="line">            <span class="keyword">if</span> self.rank[u] == self.rank[v]:  </div><div class="line">                self.rank[v] = self.rank[v]+<span class="number">1</span>  </div><div class="line">        <span class="keyword">else</span>:  </div><div class="line">            self.parent[v] = u  </div><div class="line">  </div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">find</span><span class="params">(self, x)</span>:</span>  </div><div class="line">        y = x  </div><div class="line">        <span class="keyword">while</span> self.parent[y] != <span class="number">0</span>:  </div><div class="line">            y = self.parent[y]  </div><div class="line">        root = y  </div><div class="line">        y = x  </div><div class="line">        <span class="keyword">while</span> self.parent[y] != <span class="number">0</span>:  </div><div class="line">            w = self.parent[y]  </div><div class="line">            self.parent[y] = root  </div><div class="line">            y = w  </div><div class="line">  </div><div class="line">        <span class="keyword">return</span> root  </div><div class="line">  </div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">isSameSet</span><span class="params">(self, a, b)</span>:</span>  </div><div class="line">        <span class="keyword">if</span> self.content.has_key(a) != <span class="keyword">True</span> <span class="keyword">or</span> self.content.has_key(b) != <span class="keyword">True</span>:  </div><div class="line">            <span class="keyword">return</span> <span class="keyword">False</span>  </div><div class="line">  </div><div class="line">        u = self.find(self.content[a])  </div><div class="line">        v = self.find(self.content[b])  </div><div class="line">  </div><div class="line">        <span class="keyword">return</span> u == v  </div><div class="line">  </div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">join</span><span class="params">(self, a, b)</span>:</span>  </div><div class="line">        <span class="keyword">if</span> self.content.has_key(a) != <span class="keyword">True</span> <span class="keyword">or</span> self.content.has_key(b) != <span class="keyword">True</span>:  </div><div class="line">            <span class="keyword">return</span>  </div><div class="line">  </div><div class="line">        self.union(self.content[a], self.content[b])  </div><div class="line">  </div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(self, a)</span>:</span>  </div><div class="line">        <span class="keyword">if</span> self.content.has_key(a):  </div><div class="line">            <span class="keyword">return</span>  </div><div class="line">  </div><div class="line">        self.parent.append(<span class="number">0</span>)  </div><div class="line">        self.rank.append(<span class="number">0</span>)  </div><div class="line">        self.content[i] = len(self.parent)-<span class="number">1</span>  </div><div class="line">  </div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:  </div><div class="line">    <span class="keyword">print</span> <span class="string">'假设Sheldon、Amy和Raj属于一个集合，Howard和Bernadette属于一个集合，Leonard和Penny属于一个集合'</span>  </div><div class="line">    names = [<span class="string">"Sheldon"</span>, <span class="string">"Amy"</span>, <span class="string">"Raj"</span>, <span class="string">"Howard"</span>, <span class="string">"Bernadette"</span>, <span class="string">"Leonard"</span>, <span class="string">"Penny"</span>]  </div><div class="line">    ds = DisjointSet(names)  </div><div class="line">    ds.join(<span class="string">"Sheldon"</span>, <span class="string">"Amy"</span>)  </div><div class="line">    ds.join(<span class="string">"Amy"</span>, <span class="string">"Raj"</span>)  </div><div class="line">    ds.join(<span class="string">"Howard"</span>, <span class="string">"Bernadette"</span>)  </div><div class="line">    ds.join(<span class="string">"Leonard"</span>, <span class="string">"Penny"</span>)  </div><div class="line">  </div><div class="line">    <span class="keyword">print</span> <span class="string">'Sheldon和Raj属于一个集合吗？'</span>, ds.isSameSet(<span class="string">"Sheldon"</span>, <span class="string">"Raj"</span>)  </div><div class="line">    <span class="keyword">print</span> <span class="string">'Howard和Penny属于一个集合吗？'</span>, ds.isSameSet(<span class="string">"Howard"</span>, <span class="string">"Penny"</span>)</div></pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法实现/">算法实现</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/并查集/">并查集</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://elvin.im/2012/03/08/并查集实现/" data-title="并查集实现 | Elvin Blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2012/03/10/无线承载网络无法共享Internet连接的解决方法/" title="无线承载网络无法共享Internet连接的解决方法">
+  <strong>上一篇：</strong><br/>
+  <span>
+  无线承载网络无法共享Internet连接的解决方法</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2012/03/07/快速排序算法实现/"  title="快速排序算法">
+ <strong>下一篇：</strong><br/> 
+ <span>快速排序算法
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ 
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Windows/" title="Windows">Windows<sup>1</sup></a></li>
+		
+			<li><a href="/categories/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/categories/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/categories/算法实现/" title="算法实现">算法实现<sup>2</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/并查集/" title="并查集">并查集<sup>1</sup></a></li>
+		
+			<li><a href="/tags/快速排序/" title="快速排序">快速排序<sup>1</sup></a></li>
+		
+			<li><a href="/tags/无线网络共享-Windows/" title="无线网络共享 Windows">无线网络共享 Windows<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hexo-github/" title="Hexo github">Hexo github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JavaScript-闭包-ExtJS/" title="JavaScript 闭包 ExtJS">JavaScript 闭包 ExtJS<sup>1</sup></a></li>
+		
+			<li><a href="/tags/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/tags/HTML/" title="HTML">HTML<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JS/" title="JS">JS<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><a href="http://leorz.com" target="_blank" title="Leo">Leo's Blog</a></li>
+      <li><a href="http://hexo.io" target="_blank" title="Hexo">Hexo</a></li>
+    </ul>
+</div>
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2014 
+		
+		<a href="http://elvin.im/about" target="_blank" title="Elvin Guan">Elvin Guan</a>
+		
+		</p>
+</div>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F9cc4c1668f1879156c0627818f4e84ae' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"elvin-blog"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>
