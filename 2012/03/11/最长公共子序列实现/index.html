@@ -1,0 +1,449 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>最长公共子序列实现 | Elvin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Elvin Guan">
+    
+    <meta name="description" content="今天实现的算法是求解最长公共子序列，在字母表Σ上，分别给出两个长度为n和m的字符串A和B，确定在A和B中最长公共子序列的长度并输出该最长公共子序列。这里，A=a1a2…an的子序列是一个形式为ai1ai2…aik的字符串，其中每个ij都在1和n之间，并且1&amp;lt;=i1=n，子序列不是子串，并不要求">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="Elvin Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Elvin Blog" title="Elvin Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Elvin Blog">Elvin Blog</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:elvin.im">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2012/03/11/最长公共子序列实现/" title="最长公共子序列实现" itemprop="url">最长公共子序列实现</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://elvin.im/about" title="Elvin Guan" target="_blank" itemprop="author">Elvin Guan</a>
+		
+  <p class="article-time">
+    <time datetime="2012-03-11T14:27:00.000Z" itemprop="datePublished"> 发表于 3月 11 2012</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			
+		
+		</div>
+		
+		<p>今天实现的算法是求解最长公共子序列，在字母表Σ上，分别给出两个长度为n和m的字符串A和B，确定在A和B中最长公共子序列的长度并输出该最长公共子序列。这里，A=a1a2…an的子序列是一个形式为ai1ai2…aik的字符串，其中每个ij都在1和n之间，并且1&lt;=i1<i2<...<ik>=n，子序列不是子串，并不要求连续。例如zxyxyz和xyyzx的最长公共子序列为xyyz。</i2<...<ik></p>
+<p>此问题可以用动态规划技术来解决，为了使用动态规划，首先得有一个递推公式。令A = a1a2…an好B = b1b2…bn,令L[i,j]表示a1a2…ai和b1b2…bi的最长公共子序列的长度。i、j可能为0，即表示空串。则i=0或j=0时，L[i,j]=0。递推关系如下：</p>
+<blockquote>
+<p>如果i和j都大于0，那么</p>
+<pre><code><span class="attribute">若ai </span>=<span class="string"> bj，L[i,j] = L[i-1,j-1]+1
+若ai ≠ bj，L[i,j] = max{L[i,j-1]，L[i-1,j]}</span>
+</code></pre></blockquote>
+<p>根据上述递推关系可以导出如下的算法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//算法：LCS</span></div><div class="line"><span class="comment">//输入：字符串A和B，长度分别为n和m</span></div><div class="line"><span class="comment">//输出：A和B最长公共子序列的长度和其中一个最长公共子序列</span></div><div class="line"></div><div class="line"><span class="keyword">for</span> i ← <span class="number">0</span> <span class="keyword">to</span> n:  </div><div class="line">    L[i,<span class="number">0</span>] ← <span class="number">0</span>  </div><div class="line"><span class="keyword">end</span> <span class="keyword">for</span>  </div><div class="line"><span class="keyword">for</span> j ← <span class="number">0</span> <span class="keyword">to</span> n:  </div><div class="line">    L[<span class="number">0</span>,j] ← <span class="number">0</span>  </div><div class="line"><span class="keyword">end</span> <span class="keyword">for</span>  </div><div class="line"><span class="keyword">for</span> i ← <span class="number">1</span> <span class="keyword">to</span> n:  </div><div class="line">    <span class="keyword">for</span> j ← <span class="number">1</span> <span class="keyword">to</span> m:  </div><div class="line">        <span class="keyword">if</span> ai == bi <span class="keyword">then</span> L[i,j] ← L[i-<span class="number">1</span>,j-<span class="number">1</span>] + <span class="number">1</span>  </div><div class="line">        <span class="keyword">else</span> L[i,j] ← max{L[i,j-<span class="number">1</span>],L[i-<span class="number">1</span>,j]}  </div><div class="line">        <span class="keyword">end</span> <span class="keyword">if</span>  </div><div class="line">    <span class="keyword">end</span> <span class="keyword">for</span>  </div><div class="line"><span class="keyword">end</span> <span class="keyword">for</span>  </div><div class="line"><span class="keyword">while</span> i &lt;= n <span class="keyword">and</span> j &lt;= m:  </div><div class="line">    <span class="keyword">if</span> ai == bi <span class="keyword">then</span> 输出ai i=i+<span class="number">1</span> j=j+<span class="number">1</span>  </div><div class="line">    <span class="keyword">else</span> <span class="keyword">if</span> L[i+<span class="number">1</span>,j] &gt; L[i][j+<span class="number">1</span>] <span class="keyword">then</span> i = i+<span class="number">1</span>  </div><div class="line">    <span class="keyword">else</span> j = j+<span class="number">1</span>  </div><div class="line"><span class="keyword">end</span> <span class="keyword">while</span>  </div><div class="line"><span class="keyword">return</span> L[n,m]</div></pre></td></tr></table></figure>
+
+<p>下面是C++版本的实现：</p>
+<figure class="highlight [CPP]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//main.cpp  </span></div><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;iostream&gt;  </span></div><div class="line"><span class="preprocessor">#<span class="keyword">include</span> "LCSString.h"  </span></div><div class="line">  </div><div class="line"><span class="keyword">using</span> std::<span class="built_in">cout</span>;  </div><div class="line"><span class="keyword">using</span> std::endl;  </div><div class="line">  </div><div class="line"><span class="keyword">int</span> main(<span class="keyword">void</span>) {  </div><div class="line">    LCSString s1(<span class="string">"xyxxzxyzxy"</span>);  </div><div class="line">    std::<span class="built_in">string</span> s2(<span class="string">"zxzyyzxxyxxz"</span>);  </div><div class="line">  </div><div class="line">    std::<span class="built_in">string</span> s = s1.getLCS(s2);  </div><div class="line">  </div><div class="line">    <span class="built_in">cout</span> &lt;&lt; s1 &lt;&lt; <span class="string">"和"</span> &lt;&lt; s2 &lt;&lt; <span class="string">"的一个最长公共子序列为:"</span>;  </div><div class="line">    <span class="built_in">cout</span> &lt;&lt; s &lt;&lt; endl;  </div><div class="line">  </div><div class="line">    getchar();  </div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;  </div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight [CPP]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//LCSString.h  </span></div><div class="line"><span class="preprocessor">#<span class="keyword">pragma</span> once  </span></div><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;string&gt;  </span></div><div class="line">  </div><div class="line"><span class="keyword">class</span> LCSString:<span class="keyword">public</span> std::<span class="built_in">string</span> {  </div><div class="line"><span class="keyword">public</span>:  </div><div class="line">    LCSString(<span class="keyword">void</span>);  </div><div class="line">    LCSString(<span class="keyword">const</span> <span class="keyword">char</span> * _Ptr);  </div><div class="line">    ~LCSString(<span class="keyword">void</span>);  </div><div class="line">    std::<span class="built_in">string</span> getLCS(std::<span class="built_in">string</span> s);  </div><div class="line">};</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight [CPP]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div></pre></td><td class="code"><pre><div class="line">//<span class="type">LCSString</span>.cpp  </div><div class="line"><span class="comment">#include "LCSString.h"  </span></div><div class="line"><span class="comment">#include &lt;iostream&gt;  </span></div><div class="line"><span class="keyword">using</span> std::cout;  </div><div class="line"><span class="keyword">using</span> std::endl;  </div><div class="line">  </div><div class="line"><span class="type">LCSString</span>::<span class="type">LCSString</span>(<span class="type">void</span>):std::<span class="type">string</span>() {  </div><div class="line">}  </div><div class="line">  </div><div class="line"><span class="type">LCSString</span>::<span class="type">LCSString</span>(<span class="keyword">const</span> <span class="type">char</span> * _Ptr):std::<span class="type">string</span>(_Ptr) {  </div><div class="line">}  </div><div class="line">  </div><div class="line"><span class="type">LCSString</span>::~<span class="type">LCSString</span>(<span class="type">void</span>) {  </div><div class="line">}  </div><div class="line">  </div><div class="line">//求本字符串与另一个字符串s的最长公共子序列  </div><div class="line">std::<span class="type">string</span> <span class="type">LCSString</span>::getLCS(std::<span class="type">string</span> s) {  </div><div class="line">    std::<span class="type">string</span> <span class="literal">result</span>;  </div><div class="line">    <span class="type">int</span> n_len = this-&gt;length()+<span class="number">1</span>;  </div><div class="line">    <span class="type">int</span> m_len = s.length()+<span class="number">1</span>;  </div><div class="line">    <span class="type">int</span> ** L = new <span class="type">int</span> * [n_len];  </div><div class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n_len; i++) {  </div><div class="line">        L[i] = new <span class="type">int</span> [m_len];  </div><div class="line">    }  </div><div class="line">  </div><div class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n_len; i++) {  </div><div class="line">        L[i][<span class="number">0</span>] = <span class="number">0</span>;  </div><div class="line">    }  </div><div class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m_len; i++) {  </div><div class="line">        L[<span class="number">0</span>][i] = <span class="number">0</span>;  </div><div class="line">    }  </div><div class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; n_len; i++) {  </div><div class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>;j &lt; m_len; j ++) {  </div><div class="line">            <span class="keyword">if</span> (this-&gt;operator[](i-<span class="number">1</span>) == s[j-<span class="number">1</span>]) {  </div><div class="line">                L[i][j] = L[i-<span class="number">1</span>][j-<span class="number">1</span>] + <span class="number">1</span>;  </div><div class="line">            } <span class="keyword">else</span> {  </div><div class="line">                //L[i][j]取L[i][j-<span class="number">1</span>]和L[i-<span class="number">1</span>][j]的最大值  </div><div class="line">                L[i][j] = (L[i][j-<span class="number">1</span>] &gt; L[i-<span class="number">1</span>][j]?L[i][j-<span class="number">1</span>]:L[i-<span class="number">1</span>][j]);     </div><div class="line">            }  </div><div class="line">        }  </div><div class="line">    }  </div><div class="line">  </div><div class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n_len; i++) {  </div><div class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; m_len; j++) {  </div><div class="line">            cout &lt;&lt; L[i][j] &lt;&lt; <span class="string">"  "</span>;  </div><div class="line">        }  </div><div class="line">        cout &lt;&lt; endl;  </div><div class="line">    }  </div><div class="line">  </div><div class="line">    <span class="type">int</span> i = n_len - <span class="number">1</span>;  </div><div class="line">    <span class="type">int</span> j = m_len - <span class="number">1</span>;  </div><div class="line">    <span class="keyword">while</span> (i &gt; <span class="number">0</span> && j &gt; <span class="number">0</span>) {  </div><div class="line">        <span class="keyword">if</span> (this-&gt;operator[](i-<span class="number">1</span>) == s[j-<span class="number">1</span>]) {  </div><div class="line">            <span class="literal">result</span> = s[j-<span class="number">1</span>] + <span class="literal">result</span>;   </div><div class="line">            i --;  </div><div class="line">            j --;                                                         </div><div class="line">        } <span class="keyword">else</span> <span class="keyword">if</span> (L[i-<span class="number">1</span>][j] == L[i][j-<span class="number">1</span>]) {  </div><div class="line">            i --;  </div><div class="line">        } <span class="keyword">else</span> {  </div><div class="line">            j --;  </div><div class="line">        }  </div><div class="line">    }  </div><div class="line">  </div><div class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n_len; i++) {  </div><div class="line">        delete [] L[i];  </div><div class="line">    }  </div><div class="line">    delete [] L;  </div><div class="line">      </div><div class="line">    <span class="keyword">return</span> <span class="literal">result</span>;  </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>下面是Java版本实现：</p>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line">package lcs;  </div><div class="line">  </div><div class="line">public class <span class="type">LCSString</span> {  </div><div class="line">    private <span class="type">String</span> s1;  </div><div class="line">      </div><div class="line">    public <span class="type">LCSString</span>(<span class="type">String</span> s) {  </div><div class="line">        this.s1 = new <span class="type">String</span>(s);  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    public <span class="type">String</span> getLCSString(<span class="type">String</span> s2) {  </div><div class="line">        <span class="type">String</span> <span class="literal">result</span> = new <span class="type">String</span>();  </div><div class="line">        <span class="type">int</span> n = s1.length()+<span class="number">1</span>;  </div><div class="line">        <span class="type">int</span> m = s2.length()+<span class="number">1</span>;  </div><div class="line">        <span class="type">int</span> [][] L = new <span class="type">int</span> [n][m];  </div><div class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) {  </div><div class="line">            L[i][<span class="number">0</span>] = <span class="number">0</span>;  </div><div class="line">        }  </div><div class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; i++) {  </div><div class="line">            L[<span class="number">0</span>][i]= <span class="number">0</span>;   </div><div class="line">        }  </div><div class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; n; i++) {  </div><div class="line">            <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt; m; j++) {  </div><div class="line">                <span class="keyword">if</span> (s1.charAt(i-<span class="number">1</span>) == s2.charAt(j-<span class="number">1</span>)) {  </div><div class="line">                    L[i][j]= L[i-<span class="number">1</span>][j-<span class="number">1</span>] + <span class="number">1</span>;   </div><div class="line">                } <span class="keyword">else</span> {  </div><div class="line">                    //L[i][j]取L[i][j-<span class="number">1</span>]和L[i-<span class="number">1</span>][j]的最大值    </div><div class="line">                    L[i][j] = (L[i][j-<span class="number">1</span>] &gt; L[i-<span class="number">1</span>][j]?L[i][j-<span class="number">1</span>]:L[i-<span class="number">1</span>][j]);   </div><div class="line">                }  </div><div class="line">            }  </div><div class="line">        }  </div><div class="line">        <span class="type">int</span> i = n - <span class="number">1</span>;  </div><div class="line">        <span class="type">int</span> j = m - <span class="number">1</span>;  </div><div class="line">      </div><div class="line">        <span class="keyword">while</span> (i &gt; <span class="number">0</span> && j &gt; <span class="number">0</span>) {  </div><div class="line">            <span class="keyword">if</span> (s1.charAt(i-<span class="number">1</span>) == s2.charAt(j-<span class="number">1</span>)) {  </div><div class="line">                <span class="literal">result</span> = s1.charAt(i-<span class="number">1</span>) + <span class="literal">result</span>;   </div><div class="line">                i --;  </div><div class="line">                j --;                                                         </div><div class="line">            } <span class="keyword">else</span> <span class="keyword">if</span> (L[i-<span class="number">1</span>][j] == L[i][j-<span class="number">1</span>]) {  </div><div class="line">                i --;  </div><div class="line">            } <span class="keyword">else</span> {  </div><div class="line">                j --;  </div><div class="line">            }  </div><div class="line">        }  </div><div class="line">          </div><div class="line">        <span class="keyword">return</span> <span class="literal">result</span>;  </div><div class="line">    }  </div><div class="line">      </div><div class="line">    /** </div><div class="line">     * @param args </div><div class="line">     */  </div><div class="line">    public <span class="keyword">static</span> <span class="type">void</span> main(<span class="type">String</span>[] args) {  </div><div class="line">        // <span class="type">TODO</span> <span class="type">Auto</span>-generated <span class="keyword">method</span> stub  </div><div class="line">        <span class="type">String</span> s1 = <span class="string">"xyxxzxyzxy"</span>;  </div><div class="line">        <span class="type">String</span> s2 = <span class="string">"zxzyyzxxyxxz"</span>;  </div><div class="line">        <span class="type">LCSString</span> lcs = new <span class="type">LCSString</span>(s1);  </div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(s1 + <span class="string">"和"</span> + s2 + <span class="string">"的一个最长公共子序列为:"</span> + lcs.getLCSString(s2));  </div><div class="line">    }  </div><div class="line">  </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>下面是Python版本实现：</p>
+<figure class="highlight [Python]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! /usr/bin/env python  </span></div><div class="line"><span class="comment"># -*- coding:utf-8 -*-  </span></div><div class="line">  </div><div class="line">class <span class="type">LCSString</span>:  </div><div class="line">    def __init__(self, s):  </div><div class="line">        self.s1 = str(s)  </div><div class="line">  </div><div class="line">    def getLCSString(self, s2):  </div><div class="line">        <span class="literal">result</span> = ''  </div><div class="line">        n = len(self.s1)+<span class="number">1</span>  </div><div class="line">        m = len(s2)+<span class="number">1</span>  </div><div class="line">        L = [<span class="number">0</span>]*n  </div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="type">range</span>(<span class="number">0</span>, n):  </div><div class="line">            L[i] = [<span class="number">0</span>] * m  </div><div class="line">  </div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="type">range</span>(<span class="number">1</span>, n):  </div><div class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> <span class="type">range</span>(<span class="number">1</span>, m):  </div><div class="line">                <span class="keyword">if</span> self.s1[i-<span class="number">1</span>] == s2[j-<span class="number">1</span>]:  </div><div class="line">                    L[i][j] = L[i-<span class="number">1</span>][j-<span class="number">1</span>] + <span class="number">1</span>  </div><div class="line">                <span class="keyword">else</span>:  </div><div class="line">                    L[i][j] = max(L[i-<span class="number">1</span>][j], L[i][j-<span class="number">1</span>])  </div><div class="line">          </div><div class="line">        print  </div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> L:  </div><div class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> i:  </div><div class="line">                print j,  </div><div class="line">            print  </div><div class="line">        i = n-<span class="number">1</span>  </div><div class="line">        j = m-<span class="number">1</span>  </div><div class="line">        <span class="keyword">while</span> i &gt; <span class="number">0</span> <span class="keyword">and</span> j &gt; <span class="number">0</span>:  </div><div class="line">            <span class="keyword">if</span> self.s1[i-<span class="number">1</span>] == s2[j-<span class="number">1</span>]:  </div><div class="line">                <span class="literal">result</span> = s2[j-<span class="number">1</span>] + <span class="literal">result</span>  </div><div class="line">                i -= <span class="number">1</span>  </div><div class="line">                j -= <span class="number">1</span>  </div><div class="line">            <span class="keyword">elif</span> L[i-<span class="number">1</span>][j] == L[i][j-<span class="number">1</span>]:  </div><div class="line">                i -= <span class="number">1</span>  </div><div class="line">            <span class="keyword">else</span>:  </div><div class="line">                j -= <span class="number">1</span>  </div><div class="line">          </div><div class="line">        <span class="keyword">return</span> <span class="literal">result</span>  </div><div class="line">  </div><div class="line"><span class="keyword">if</span> __name__ == '__main__':  </div><div class="line">    s1 = <span class="string">"xyxxzxyzxy"</span>  </div><div class="line">    s2 = <span class="string">"zxzyyzxxyxxz"</span>  </div><div class="line">    lcs = <span class="type">LCSString</span>(s1)  </div><div class="line">    print s1 + <span class="string">"和"</span> + s2 + <span class="string">"的一个最长公共子序列为:"</span> + lcs.getLCSString(s2)</div></pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法实现/">算法实现</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/最长公共子序列/">最长公共子序列</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://elvin.im/2012/03/11/最长公共子序列实现/" data-title="最长公共子序列实现 | Elvin Blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/10/22/IE下textfield粘贴内容中的换行符/" title="IE下textfield粘贴内容中的换行符">
+  <strong>上一篇：</strong><br/>
+  <span>
+  IE下textfield粘贴内容中的换行符</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2012/03/10/无线承载网络无法共享Internet连接的解决方法/"  title="无线承载网络无法共享Internet连接的解决方法">
+ <strong>下一篇：</strong><br/> 
+ <span>无线承载网络无法共享Internet连接的解决方法
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ 
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Windows/" title="Windows">Windows<sup>1</sup></a></li>
+		
+			<li><a href="/categories/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/categories/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/categories/算法实现/" title="算法实现">算法实现<sup>4</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/最长公共子序列/" title="最长公共子序列">最长公共子序列<sup>1</sup></a></li>
+		
+			<li><a href="/tags/寻找多数元素/" title="寻找多数元素">寻找多数元素<sup>1</sup></a></li>
+		
+			<li><a href="/tags/并查集/" title="并查集">并查集<sup>1</sup></a></li>
+		
+			<li><a href="/tags/快速排序/" title="快速排序">快速排序<sup>1</sup></a></li>
+		
+			<li><a href="/tags/无线网络共享-Windows/" title="无线网络共享 Windows">无线网络共享 Windows<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hexo-github/" title="Hexo github">Hexo github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JavaScript-闭包-ExtJS/" title="JavaScript 闭包 ExtJS">JavaScript 闭包 ExtJS<sup>1</sup></a></li>
+		
+			<li><a href="/tags/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/tags/HTML/" title="HTML">HTML<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JS/" title="JS">JS<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><a href="http://leorz.com" target="_blank" title="Leo">Leo's Blog</a></li>
+      <li><a href="http://hexo.io" target="_blank" title="Hexo">Hexo</a></li>
+    </ul>
+</div>
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2014 
+		
+		<a href="http://elvin.im/about" target="_blank" title="Elvin Guan">Elvin Guan</a>
+		
+		</p>
+</div>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F9cc4c1668f1879156c0627818f4e84ae' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"elvin-blog"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>
