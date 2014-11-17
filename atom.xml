@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://elvin.im/"/>
-  <updated>2014-10-25T16:27:49.051Z</updated>
+  <updated>2014-11-17T15:16:42.308Z</updated>
   <id>http://elvin.im/</id>
   
   <author>
@@ -13,6 +13,33 @@
   </author>
   
   <generator uri="http://zespia.tw/hexo/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[Java POI使用备忘]]></title>
+    <link href="http://elvin.im/2014/11/16/Java-POI%E4%BD%BF%E7%94%A8%E5%A4%87%E5%BF%98/"/>
+    <id>http://elvin.im/2014/11/16/Java-POI使用备忘/</id>
+    <published>2014-11-16T12:16:41.000Z</published>
+    <updated>2014-11-17T15:16:08.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="修改单元格的样式">修改单元格的样式</h2>
+<p>比如将单元格背景色变灰</p>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="constant">CellStyle cellStyle</span> = cell.getCellStyle();</div><div class="line"><span class="constant">CellStyle greyCellStyle</span> = workbook.createCellStyle();</div><div class="line">greyCellStyle.cloneStyleFrom(cellStyle);    <span class="comment">//先复制原有样式，再修改</span></div><div class="line">greyCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);</div><div class="line">greyCellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());</div><div class="line">cell.setCellStyle(greyCellStyle);</div></pre></td></tr></table></figure>
+
+<p>因为在读取excel的时候，POI通过getCellStyle获取的单元格样式可能是被多个相同样式的单元格共享的，直接修改旧样式会造成混乱。所以这里先复制原有样式，再修改。</p>
+<h1 id="设置自定义背景颜色">设置自定义背景颜色</h1>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">style.setFillPattern(CellStyle.SOLID_FOREGROUND);</div><div class="line"><span class="keyword">if</span> (workbook <span class="keyword">instanceof</span> HSSFWorkbook) {</div><div class="line">    HSSFWorkbook hssfWorkbook = (HSSFWorkbook) workbook;</div><div class="line">    HSSFPalette customPalette = hssfWorkbook.getCustomPalette();</div><div class="line">    customPalette.setColorAtIndex(HSSFColor.BLUE.index, (<span class="keyword">byte</span>) <span class="number">0</span>, (<span class="keyword">byte</span>) <span class="number">102</span>, (<span class="keyword">byte</span>) <span class="number">153</span>);</div><div class="line">    style.setFillForegroundColor(HSSFColor.BLUE.index);</div><div class="line">} <span class="keyword">else</span> <span class="keyword">if</span> (workbook <span class="keyword">instanceof</span> XSSFWorkbook) {</div><div class="line">    XSSFCellStyle xssfCellStyle = (XSSFCellStyle) style;</div><div class="line">    XSSFColor newColor = <span class="keyword">new</span> XSSFColor(<span class="keyword">new</span> java.awt.Color(<span class="number">0</span>, <span class="number">102</span>, <span class="number">153</span>));</div><div class="line">    xssfCellStyle.setFillForegroundColor(newColor);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="修改单元格的样式">修改单元格的样式</h2>
+<p>比如将单元格背景色变灰</p>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</]]>
+    </summary>
+    
+      <category term="Java POI" scheme="http://elvin.im/tags/Java-POI/"/>
+    
+      <category term="Java" scheme="http://elvin.im/categories/Java/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[使用Hexo在github搭建免费博客]]></title>
@@ -433,7 +460,7 @@
     <link href="http://elvin.im/2012/03/07/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/"/>
     <id>http://elvin.im/2012/03/07/快速排序算法实现/</id>
     <published>2012-03-07T13:53:22.000Z</published>
-    <updated>2014-10-25T14:02:32.000Z</updated>
+    <updated>2014-11-16T16:41:51.000Z</updated>
     <content type="html"><![CDATA[<p>快速排序算法是20世纪十大最伟大的算法之一。它是由C.R.A.Hoare于1962年提出的一种划分交换排序算法，其采用的是分治的思想，分治是将原问题分解成若干与原问题相似的子问题，通过递归的解决这些子问题来最终得出原问题的解。</p>
 <p>快速排序是通过一个划分（SPLIT）算法来将待排序序列划分成两部分，其中左边的元素都小于中间的元素，右边的元素都小于中间的元素。然后通过对子数组进行递归划分就可以完成对整个序列的排序。所以划分（SPLIT）算法是快速排序的核心，它的伪代码如下：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//算法：SPLIT</span></div><div class="line"><span class="comment">//输入：数组A[low...high]</span></div><div class="line"><span class="comment">//输出：1）重新排列的A；2）划分元素A[low]的新位置w；</span></div><div class="line"></div><div class="line">i ← low  </div><div class="line">x ← A[low]  </div><div class="line"><span class="keyword">for</span> j ← low+<span class="number">1</span> <span class="keyword">to</span> high:  </div><div class="line">    <span class="keyword">if</span> A[j] &lt;= x <span class="keyword">then</span>:  </div><div class="line">        i ← i+<span class="number">1</span>  </div><div class="line">        <span class="keyword">if</span> i != j <span class="keyword">then</span> 互换A[i]和A[j]  </div><div class="line">        <span class="keyword">end</span> <span class="keyword">if</span>  </div><div class="line">    <span class="keyword">end</span> <span class="keyword">if</span>  </div><div class="line"><span class="keyword">end</span> <span class="keyword">for</span>  </div><div class="line">互换A[low]和A[i]  </div><div class="line">w ← i  </div><div class="line"><span class="keyword">return</span> A和w</div></pre></td></tr></table></figure>
