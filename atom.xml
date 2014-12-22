@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://elvin.im/"/>
-  <updated>2014-12-22T12:05:46.943Z</updated>
+  <updated>2014-12-22T12:09:53.539Z</updated>
   <id>http://elvin.im/</id>
   
   <author>
@@ -19,10 +19,8 @@
     <link href="http://elvin.im/2014/12/22/HSSF%E5%92%8CXSSF%E7%89%B9%E6%80%A7%E9%80%9F%E6%88%90%E8%AF%B4%E6%98%8E/"/>
     <id>http://elvin.im/2014/12/22/HSSF和XSSF特性速成说明/</id>
     <published>2014-12-22T11:59:08.000Z</published>
-    <updated>2014-12-22T12:05:19.000Z</updated>
-    <content type="html"><![CDATA[<p>title: HSSF和XSSF特性速成说明<br>date: 2014-12-22 19:59:08<br>category: Java<br>tags: Java POI</p>
-<hr>
-<p>本文翻译自 <a href="http://poi.apache.org/spreadsheet/quick-guide.html" target="_blank" rel="external">Busy Developers’ Guide to HSSF and XSSF Features</a></p>
+    <updated>2014-12-22T12:09:04.000Z</updated>
+    <content type="html"><![CDATA[<p>本文翻译自 <a href="http://poi.apache.org/spreadsheet/quick-guide.html" target="_blank" rel="external">Busy Developers’ Guide to HSSF and XSSF Features</a></p>
 <h2 id="如何新建工作簿">如何新建工作簿</h2>
 <figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Workbook wb = <span class="keyword">new</span> HSSFWorkbook();</div><div class="line">FileOutputStream fileOut = <span class="keyword">new</span> FileOutputStream(<span class="string">"workbook.xls"</span>);</div><div class="line">wb.<span class="keyword">write</span>(fileOut);</div><div class="line">fileOut.<span class="keyword">close</span>();</div><div class="line"></div><div class="line">Workbook wb = <span class="keyword">new</span> XSSFWorkbook();</div><div class="line">FileOutputStream fileOut = <span class="keyword">new</span> FileOutputStream(<span class="string">"workbook.xlsx"</span>);</div><div class="line">wb.<span class="keyword">write</span>(fileOut);</div><div class="line">fileOut.<span class="keyword">close</span>();</div></pre></td></tr></table></figure>
 
@@ -125,9 +123,7 @@
 <p>本文并没有全文翻译，还有一些不太常用的功能可以参考原文</p>
 ]]></content>
     <summary type="html">
-    <![CDATA[<p>title: HSSF和XSSF特性速成说明<br>date: 2014-12-22 19:59:08<br>category: Java<br>tags: Java POI</p>
-<hr>
-<p>本文翻译自 <a href="http://poi.apache.org/]]>
+    <![CDATA[<p>本文翻译自 <a href="http://poi.apache.org/spreadsheet/quick-guide.html" target="_blank" rel="external">Busy Developers’ Guide to HSSF and XSSF]]>
     </summary>
     
       <category term="Java POI" scheme="http://elvin.im/tags/Java-POI/"/>

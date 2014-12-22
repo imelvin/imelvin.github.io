@@ -9,11 +9,9 @@
     
     <meta name="author" content="Elvin Guan">
     
-    <meta name="description" content="title: HSSF和XSSF特性速成说明date: 2014-12-22 19:59:08category: Javatags: Java POI
-
-本文翻译自 Busy Developers’ Guide to HSSF and XSSF Features
+    <meta name="description" content="本文翻译自 Busy Developers’ Guide to HSSF and XSSF Features
 如何新建工作簿
-123456789W">
+123456789Workbook wb = new HSSFWorkbook();FileOutputStream fileOut = new FileOutputStre">
     
     
     
@@ -95,9 +93,7 @@
 		
 		</div>
 		
-		<p>title: HSSF和XSSF特性速成说明<br>date: 2014-12-22 19:59:08<br>category: Java<br>tags: Java POI</p>
-<hr>
-<p>本文翻译自 <a href="http://poi.apache.org/spreadsheet/quick-guide.html" target="_blank" rel="external">Busy Developers’ Guide to HSSF and XSSF Features</a></p>
+		<p>本文翻译自 <a href="http://poi.apache.org/spreadsheet/quick-guide.html" target="_blank" rel="external">Busy Developers’ Guide to HSSF and XSSF Features</a></p>
 <h2 id="如何新建工作簿">如何新建工作簿</h2>
 <figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Workbook wb = <span class="keyword">new</span> HSSFWorkbook();</div><div class="line">FileOutputStream fileOut = <span class="keyword">new</span> FileOutputStream(<span class="string">"workbook.xls"</span>);</div><div class="line">wb.<span class="keyword">write</span>(fileOut);</div><div class="line">fileOut.<span class="keyword">close</span>();</div><div class="line"></div><div class="line">Workbook wb = <span class="keyword">new</span> XSSFWorkbook();</div><div class="line">FileOutputStream fileOut = <span class="keyword">new</span> FileOutputStream(<span class="string">"workbook.xlsx"</span>);</div><div class="line">wb.<span class="keyword">write</span>(fileOut);</div><div class="line">fileOut.<span class="keyword">close</span>();</div></pre></td></tr></table></figure>
 
