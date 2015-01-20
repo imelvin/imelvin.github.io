@@ -4,14 +4,15 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>无线承载网络无法共享Internet连接的解决方法 | Elvin Blog</title>
+    <title>Android学习之RSS阅读器开发之一——搭建开发环境 | Elvin Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Elvin Guan">
     
-    <meta name="description" content="当没有无线路由器的时候怎么让Android手机通过家用宽带连接Internet呢？只要有一台笔记本或者是台式机+无线网卡。具体的做法如下：
-首先以管理员身份在CMD中运行如下命令：
-1netsh wlan set hostednetwork mode=allow ssid=xxx key=xxxxx">
+    <meta name="description" content="安装IDE
+Android Studio已经出了正式版，我这里就选用了Android Studio作为我的IDE，Android Studio可以在这里下载。
+我是在OS X Yosemite下开发，在运行Android Studio的时候遇到以下错误
+1Unable to find a valid">
     
     
     
@@ -72,14 +73,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2012/03/10/无线承载网络无法共享Internet连接的解决方法/" title="无线承载网络无法共享Internet连接的解决方法" itemprop="url">无线承载网络无法共享Internet连接的解决方法</a>
+      <a href="/2015/01/19/Android学习之RSS阅读器开发之一——搭建开发环境/" title="Android学习之RSS阅读器开发之一——搭建开发环境" itemprop="url">Android学习之RSS阅读器开发之一——搭建开发环境</a>
   </h1>
   <p class="article-author">By
        
 		<a href="http://elvin.im/about" title="Elvin Guan" target="_blank" itemprop="author">Elvin Guan</a>
 		
   <p class="article-time">
-    <time datetime="2012-03-10T13:32:37.000Z" itemprop="datePublished"> 发表于 3月 10 2012</time>
+    <time datetime="2015-01-19T15:21:53.000Z" itemprop="datePublished"> 发表于 1月 19 2015</time>
     
   </p>
 </header>
@@ -89,30 +90,22 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装IDE"><span class="toc-number">1.</span> <span class="toc-text">安装IDE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模拟器运行"><span class="toc-number">2.</span> <span class="toc-text">模拟器运行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#单元测试"><span class="toc-number">3.</span> <span class="toc-text">单元测试</span></a></li></ol>
 		
 		</div>
 		
-		<p>当没有无线路由器的时候怎么让Android手机通过家用宽带连接Internet呢？只要有一台笔记本或者是台式机+无线网卡。具体的做法如下：</p>
-<p>首先以管理员身份在CMD中运行如下命令：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netsh wlan <span class="operator"><span class="keyword">set</span> hostednetwork <span class="keyword">mode</span>=allow ssid=xxx <span class="keyword">key</span>=xxxxxxxxxxxx</span></div></pre></td></tr></table></figure>
+		<h2 id="安装IDE">安装IDE</h2>
+<p>Android Studio已经出了正式版，我这里就选用了Android Studio作为我的IDE，Android Studio可以在<a href="http://android-studio.org/" target="_blank" rel="external">这里</a>下载。</p>
+<p>我是在OS X Yosemite下开发，在运行Android Studio的时候遇到以下错误</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Unable <span class="keyword">to</span> <span class="keyword">find</span> <span class="keyword">a</span> valid jvm</div></pre></td></tr></table></figure>
 
-<p>该命令启用了无线承载网络并将无线网络的SSID设置为xxx，密码设置为xxxxxxxxxxxxxx，此时会出现一个新的网络连接，我的机器是<strong>无线网络连接 2</strong>。此命令运行成功后将连接到Internet的网络连接的Internet连接共享到新出现的<strong>无线网络连接 2</strong>。截图如下：</p>
-<p><img src="http://elvin-blog.qiniudn.com/wlan-collection.jpg" alt=""></p>
-<p>最后开启该无线承载网络即可，命令如下：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netsh wlan <span class="operator"><span class="keyword">start</span> hostednetwork</span></div></pre></td></tr></table></figure>
-
-
-
-<p>此时手机应该已经可以正常连接到此无线网络并正常上网了。</p>
-<p>但在共享Internet连接的时候可能会出现如下错误：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">An <span class="keyword">error</span> occurred <span class="keyword">while</span> Internet Connection Sharing we being enabled.Internet Connection Sharing cannot be enabled. A LAN connection <span class="keyword">is</span> already configured <span class="keyword">with</span> <span class="keyword">the</span> IP address <span class="keyword">that</span> <span class="keyword">is</span> required <span class="keyword">for</span> automatic IP addressing.</div></pre></td></tr></table></figure>
-
-<p>此时可以通过如下两条命令修复：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">netsh int ip <span class="operator"><span class="keyword">reset</span> D:\resetlog.txt</span></div><div class="line">netsh winsock <span class="keyword">reset</span> <span class="keyword">catalog</span></div></pre></td></tr></table></figure>
-
-<p>用管理员权限执行完这两条命令以后重启，应该就可以正常共享Internet连接了。</p>
-<p>参考信息：<a href="http://www.makeuseof.com/answers/share-wireless-internet-connection-windows-7/" target="_blank" rel="external">http://www.makeuseof.com/answers/share-wireless-internet-connection-windows-7/</a></p>
+<p>后面经过Google后发现Android Studio的info.plist文件中配置的JVMversion为1.6*，然后发现本机之前装的是java 8，所以下载了一个1.6版本的java解决了此问题。</p>
+<h2 id="模拟器运行">模拟器运行</h2>
+<p>安装好IDE，更新好SDK以后，第一件事就是新建了一个测试项目，这里要注意项目compile SDK版本要跟创建项目时的一致，不然会出现一些错误。</p>
+<p>模拟器运行直接选择app执行，然后选择一个虚拟设备就可以了。</p>
+<h2 id="单元测试">单元测试</h2>
+<p>搭建好基本的开发环境以后，关注了一下Android的单元测试，Android有很多测试的基类，可以继承这些类实现不同的测试目的。</p>
+<p>目前用到的是AndroidTestCase。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -120,13 +113,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Windows/">Windows</a>
+  <a class="article-category-link" href="/categories/Android/">Android</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/无线网络共享-Windows/">无线网络共享 Windows</a>
+  <span></span> <a href="/tags/Android/">Android</a>
   </div>
 
 </div>
@@ -134,7 +127,7 @@
 
 <div class="article-share" id="share">
 
-  <div data-url="http://elvin.im/2012/03/10/无线承载网络无法共享Internet连接的解决方法/" data-title="无线承载网络无法共享Internet连接的解决方法 | Elvin Blog" data-tsina="null" class="share clearfix">
+  <div data-url="http://elvin.im/2015/01/19/Android学习之RSS阅读器开发之一——搭建开发环境/" data-title="Android学习之RSS阅读器开发之一——搭建开发环境 | Elvin Blog" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -143,19 +136,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2012/03/11/最长公共子序列实现/" title="最长公共子序列实现">
-  <strong>上一篇：</strong><br/>
-  <span>
-  最长公共子序列实现</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2012/03/09/寻找多数元素实现/"  title="寻找多数元素实现">
+<a href="/2014/12/22/HSSF和XSSF特性速成说明/"  title="HSSF和XSSF特性速成说明">
  <strong>下一篇：</strong><br/> 
- <span>寻找多数元素实现
+ <span>HSSF和XSSF特性速成说明
 </span>
 </a>
 </div>
@@ -174,7 +159,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装IDE"><span class="toc-number">1.</span> <span class="toc-text">安装IDE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模拟器运行"><span class="toc-number">2.</span> <span class="toc-text">模拟器运行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#单元测试"><span class="toc-number">3.</span> <span class="toc-text">单元测试</span></a></li></ol>
  
   </div>
 
