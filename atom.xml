@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://elvin.im/"/>
-  <updated>2015-01-20T11:23:28.994Z</updated>
+  <updated>2015-01-25T05:15:41.778Z</updated>
   <id>http://elvin.im/</id>
   
   <author>
@@ -13,6 +13,58 @@
   </author>
   
   <generator uri="http://zespia.tw/hexo/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[Android学习之RSS阅读器开发之二——基本功能完成]]></title>
+    <link href="http://elvin.im/2015/01/25/Android%E5%AD%A6%E4%B9%A0%E4%B9%8BRSS%E9%98%85%E8%AF%BB%E5%99%A8%E5%BC%80%E5%8F%91%E4%B9%8B%E4%BA%8C%E2%80%94%E2%80%94%E5%9F%BA%E6%9C%AC%E5%8A%9F%E8%83%BD%E5%AE%8C%E6%88%90/"/>
+    <id>http://elvin.im/2015/01/25/Android学习之RSS阅读器开发之二——基本功能完成/</id>
+    <published>2015-01-25T05:09:47.000Z</published>
+    <updated>2015-01-25T05:15:37.000Z</updated>
+    <content type="html"><![CDATA[<p>经过一周的边做边学，一个RSS阅读器在功能上已经基本完成。源码放在<a href="https://github.com/imelvin/RSSReader" target="_blank" rel="external">这里</a></p>
+<p>该应用实现的功能如下：</p>
+<pre><code>-<span class="ruby"> 侧滑菜单
+</span>-<span class="ruby"> 下拉刷新、上拉加载更多
+</span>-<span class="ruby"> 网络下载<span class="constant">XML</span>文件
+</span>-<span class="ruby"> <span class="constant">XML</span>解析
+</span>-<span class="ruby"> <span class="constant">Sqlite</span>读写
+</span>-<span class="ruby"> <span class="constant">TextView</span>显示<span class="constant">Html</span></span>
+</code></pre><p>下面是一些界面功能的截图和说明</p>
+<h2 id="初始状态">初始状态</h2>
+<p><img src="http://elvin-blog.qiniudn.com/feed_list1.png" alt=""></p>
+<p>这里可以通过点击添加订阅源按钮去添加一个新的订阅源</p>
+<h2 id="添加订阅源">添加订阅源</h2>
+<p><img src="http://elvin-blog.qiniudn.com/add_feed1.png" alt=""></p>
+<p>在这里可以输入订阅源地址，然后点击回车添加</p>
+<p><img src="http://elvin-blog.qiniudn.com/add_feed2.png" alt=""></p>
+<p>点击回车后会开启一个AsyncTask去下载RSS文件，并用XMLPullParser进行解析，然后存到本地Sqlite数据库。加入AsyncTask出现异常会提示“请输入一个合法的地址”</p>
+<h2 id="RSS条目列表">RSS条目列表</h2>
+<p><img src="http://elvin-blog.qiniudn.com/item_list1.png" alt=""></p>
+<p>在添加了订阅源后会回到条目列表界面，并用列表显示数据库里面的条目。</p>
+<h2 id="阅读界面">阅读界面</h2>
+<p><img src="http://elvin-blog.qiniudn.com/item_detail1.png" alt=""></p>
+<p>点击某个条目，会进入阅读界面，阅读界面的内容用Html.fromHtml将Html文本显示到TextView。</p>
+<p><img src="http://elvin-blog.qiniudn.com/item_detail2.png" alt=""></p>
+<p>点击打开原始界面按钮，会调用浏览器打开该条目的链接。</p>
+<h2 id="下拉刷新和上拉加载更多">下拉刷新和上拉加载更多</h2>
+<p>条目列表界面加入了下拉刷新和上拉加载更多的功能</p>
+<p><img src="http://elvin-blog.qiniudn.com/item_list2.png" alt=""><br><img src="http://elvin-blog.qiniudn.com/item_list3.png" alt=""></p>
+<p>下拉刷新会下载新版本的RSS文件并解析存储到数据库，并更新列表</p>
+<p><img src="http://elvin-blog.qiniudn.com/item_list4.png" alt=""></p>
+<p>条目列表不会一次显示数据库中的所有记录，而是分页显示，每次上拉会加载下一页</p>
+<h2 id="侧滑菜单">侧滑菜单</h2>
+<p><img src="http://elvin-blog.qiniudn.com/feed_list2.png" alt=""></p>
+<p>侧滑菜单中的列表是不同的订阅源</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>经过一周的边做边学，一个RSS阅读器在功能上已经基本完成。源码放在<a href="https://github.com/imelvin/RSSReader" target="_blank" rel="external">这里</a></p>
+<p>该应用实现的功能如下：<]]>
+    </summary>
+    
+      <category term="Android" scheme="http://elvin.im/tags/Android/"/>
+    
+      <category term="Android" scheme="http://elvin.im/categories/Android/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[Android学习之RSS阅读器开发之一——搭建开发环境]]></title>
