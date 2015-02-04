@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://elvin.im/"/>
-  <updated>2015-01-25T05:19:14.996Z</updated>
+  <updated>2015-02-04T16:34:01.089Z</updated>
   <id>http://elvin.im/</id>
   
   <author>
@@ -13,6 +13,43 @@
   </author>
   
   <generator uri="http://zespia.tw/hexo/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[Android学习之RSS阅读器开发之三——功能更新]]></title>
+    <link href="http://elvin.im/2015/02/05/Android%E5%AD%A6%E4%B9%A0%E4%B9%8BRSS%E9%98%85%E8%AF%BB%E5%99%A8%E5%BC%80%E5%8F%91%E4%B9%8B%E4%B8%89%E2%80%94%E2%80%94%E5%8A%9F%E8%83%BD%E6%9B%B4%E6%96%B0/"/>
+    <id>http://elvin.im/2015/02/05/Android学习之RSS阅读器开发之三——功能更新/</id>
+    <published>2015-02-04T16:31:06.000Z</published>
+    <updated>2015-02-04T16:32:25.000Z</updated>
+    <content type="html"><![CDATA[<p>回到珠海这两天晚上对RSS阅读器进行了一些更新。源码放在<a href="https://github.com/imelvin/RSSReader" target="_blank" rel="external">这里</a></p>
+<p>下面是一些界面功能的截图和说明</p>
+<h2 id="打开原始页面">打开原始页面</h2>
+<p><img src="http://elvin-blog.qiniudn.com/rss_detail1_1.png" alt=""></p>
+<p>使用App自带的WebView打开原始页面，并提供菜单以复制链接和用其他浏览器打开。</p>
+<h2 id="界面调整">界面调整</h2>
+<p><img src="http://elvin-blog.qiniudn.com/item_list1_1.png" alt=""></p>
+<p>调整了ListView的间距。</p>
+<p><img src="http://elvin-blog.qiniudn.com/feed_list1_1.png" alt=""></p>
+<p>对侧滑菜单做了改动，由于图片都是网上找的，所以有些不协调。</p>
+<h2 id="收藏和删除功能">收藏和删除功能</h2>
+<p><img src="http://elvin-blog.qiniudn.com/item_list1_2.png" alt=""></p>
+<p>长按某个条目会弹出菜单，可以收藏和删除。收藏会将该条目加入收藏夹，而删除会将相应条目删除，包括收藏夹中的。</p>
+<h2 id="获取订阅源的进度条">获取订阅源的进度条</h2>
+<p><img src="http://elvin-blog.qiniudn.com/add_feed_progress.png" alt=""></p>
+<p>优化了添加订阅源的进度显示，有百分比可以提示用户。</p>
+<h2 id="使用SQL_Cipher">使用SQL Cipher</h2>
+<p><img src="http://elvin-blog.qiniudn.com/sqlcipher1.png" alt=""></p>
+<p>使用SQL Cipher对数据库加密，加密后的数据库就无法被sqlite读取了。SQL Cipher在使用上与sqlite几乎完全一样。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>回到珠海这两天晚上对RSS阅读器进行了一些更新。源码放在<a href="https://github.com/imelvin/RSSReader" target="_blank" rel="external">这里</a></p>
+<p>下面是一些界面功能的截图和说明</]]>
+    </summary>
+    
+      <category term="Android" scheme="http://elvin.im/tags/Android/"/>
+    
+      <category term="Android" scheme="http://elvin.im/categories/Android/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[Android学习之RSS阅读器开发之二——基本功能完成]]></title>
