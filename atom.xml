@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://elvin.im/"/>
-  <updated>2015-02-04T16:34:01.089Z</updated>
+  <updated>2015-05-05T11:57:57.052Z</updated>
   <id>http://elvin.im/</id>
   
   <author>
@@ -13,6 +13,41 @@
   </author>
   
   <generator uri="http://zespia.tw/hexo/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[使用参数占位符查询防止SQL/HQL注入]]></title>
+    <link href="http://elvin.im/2015/05/05/%E4%BD%BF%E7%94%A8%E5%8F%82%E6%95%B0%E5%8D%A0%E4%BD%8D%E7%AC%A6%E6%9F%A5%E8%AF%A2%E9%98%B2%E6%AD%A2SQL-HQL%E6%B3%A8%E5%85%A5/"/>
+    <id>http://elvin.im/2015/05/05/使用参数占位符查询防止SQL-HQL注入/</id>
+    <published>2015-05-05T11:54:48.000Z</published>
+    <updated>2015-05-05T11:56:45.000Z</updated>
+    <content type="html"><![CDATA[<p>在一些需要数据库查询的场景中，查询条件常常是通过用户输入来的。这里经常就会出现拼接SQL或者HQL的代码。比如：</p>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">String</span> hql = <span class="string">"from table where key = '"</span> + <span class="keyword">key</span> + <span class="string">"' order by id desc"</span>;</div></pre></td></tr></table></figure>
+
+<p>这种方式可以完成查询的需求，但是也会代码安全风险，比如用户输入如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span><span class="string">' or '</span><span class="number">1</span><span class="string">'='</span><span class="number">1</span></div></pre></td></tr></table></figure>
+
+<p>该参数输入后，经过拼接后就变成了</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> table <span class="keyword">where</span> key = <span class="string">'1'</span> <span class="keyword">or</span> <span class="string">'1'</span>=<span class="string">'1'</span> <span class="keyword">order</span> <span class="keyword">by</span> id <span class="keyword">desc</span></div></pre></td></tr></table></figure>
+
+<p>这样就会将该表中的所有记录都查询出来。同样的问题在使用SQL的时候同样会有。</p>
+<p>解决这类问题其实很简单，只需要在写数据库查询代码时不要使用SQL和HQL拼接，在需要传递参数时，用参数占位符即可。比如：</p>
+<figure class="highlight [java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">String</span> hql = <span class="string">"from table where key = ? order by id desc"</span>;</div><div class="line"><span class="keyword">this</span>.hibernateTemplate.find(hql, key);</div></pre></td></tr></table></figure>
+
+<p>再比如：</p>
+<figure class="highlight [java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="variable">String</span> hql = <span class="string">"from table where key = :key order by id desc"</span>;</div><div class="line"><span class="variable">Query</span> <span class="keyword">query</span> = session.create<span class="variable">Query</span>(hql);</div><div class="line"><span class="keyword">query</span>.set<span class="variable">String</span>(<span class="string">"key"</span>, key);</div></pre></td></tr></table></figure>
+
+<p>用参数占位符的方式可以使SQL在数据库预编译，将参数单独传递给数据库，就算参数中有特殊符号，也不会被数据库当做语句执行，这种方式可以有效的避免SQL注入漏洞。<br>SQL拼接产生注入漏洞的原因就是拼接出来的SQL在执行的时候才会进行编译。数据库收到的只是一个Plain SQL，无法区分是否被注入。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>在一些需要数据库查询的场景中，查询条件常常是通过用户输入来的。这里经常就会出现拼接SQL或者HQL的代码。比如：</p>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div cla]]>
+    </summary>
+    
+      <category term="Hibernate 注入" scheme="http://elvin.im/tags/Hibernate-%E6%B3%A8%E5%85%A5/"/>
+    
+      <category term="数据库" scheme="http://elvin.im/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[Android学习之RSS阅读器开发之三——功能更新]]></title>
