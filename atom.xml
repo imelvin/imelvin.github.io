@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://elvin.im/"/>
-  <updated>2015-05-05T11:57:57.052Z</updated>
+  <updated>2015-05-15T12:01:45.360Z</updated>
   <id>http://elvin.im/</id>
   
   <author>
@@ -13,6 +13,171 @@
   </author>
   
   <generator uri="http://zespia.tw/hexo/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[CentOS命令备忘录]]></title>
+    <link href="http://elvin.im/2015/05/15/CentOS%E5%91%BD%E4%BB%A4%E5%A4%87%E5%BF%98%E5%BD%95/"/>
+    <id>http://elvin.im/2015/05/15/CentOS命令备忘录/</id>
+    <published>2015-05-15T11:58:23.000Z</published>
+    <updated>2015-05-15T12:00:42.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="系统资源监控">系统资源监控</h2>
+<h3 id="CPU和内存">CPU和内存</h3>
+<p>top命令有些类似windows任务管理器</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">top</span></div></pre></td></tr></table></figure>
+
+<h3 id="磁盘IO">磁盘IO</h3>
+<p>以下命令会每1秒打印磁盘IO情况，打印10次</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">iostat <span class="operator">-d</span> -m <span class="number">1</span> <span class="number">10</span></div></pre></td></tr></table></figure>
+
+<p>若此命令不存在，则运行以下命令安装</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum <span class="operator"><span class="keyword">install</span> sysstat</span></div></pre></td></tr></table></figure>
+
+<h3 id="网络监控">网络监控</h3>
+<p>以下命令会打开一个网络监控程序</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">iptraf-ng</div></pre></td></tr></table></figure>
+
+<p>若此命令不存在，则运行以下命令安装</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum <span class="operator"><span class="keyword">install</span> iptraf</span></div></pre></td></tr></table></figure>
+
+<h2 id="防火墙">防火墙</h2>
+<h3 id="查看端口是否打开">查看端口是否打开</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">firewall-cmd --query-port</span>=<span class="string">3306/tcp</span></div></pre></td></tr></table></figure>
+
+<h3 id="打开/关闭端口">打开/关闭端口</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">firewall-cmd <span class="variable">--add-port=</span><span class="number">3306</span>/tcp    <span class="comment">#打开端口</span></div><div class="line">firewall-cmd <span class="variable">--remove-port=</span><span class="number">3306</span>/tcp    <span class="comment">#关闭端口</span></div></pre></td></tr></table></figure>
+
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="系统资源监控">系统资源监控</h2>
+<h3 id="CPU和内存">CPU和内存</h3>
+<p>top命令有些类似windows任务管理器</p>
+<figure class="highlight [shell]"><table><tr><td class=]]>
+    </summary>
+    
+      <category term="CentOS Linux" scheme="http://elvin.im/tags/CentOS-Linux/"/>
+    
+      <category term="Linux" scheme="http://elvin.im/categories/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[CentOS 7下MySQL与Tomcat环境搭建过程备份]]></title>
+    <link href="http://elvin.im/2015/05/13/CentOS-7%E4%B8%8BMySQL%E4%B8%8ETomcat%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B%E5%A4%87%E4%BB%BD/"/>
+    <id>http://elvin.im/2015/05/13/CentOS-7下MySQL与Tomcat环境搭建过程备份/</id>
+    <published>2015-05-13T11:52:33.000Z</published>
+    <updated>2015-05-15T12:00:55.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="安装MySQL">安装MySQL</h2>
+<p>MySQL的安装参考了官方的安装文档<br><a href="http://dev.mysql.com/doc/refman/5.6/en/binary-installation.html" target="_blank" rel="external">http://dev.mysql.com/doc/refman/5.6/en/binary-installation.html</a><br><a href="http://dev.mysql.com/doc/refman/5.6/en/default-privileges.html" target="_blank" rel="external">http://dev.mysql.com/doc/refman/5.6/en/default-privileges.html</a></p>
+<h3 id="安装MySQL的依赖">安装MySQL的依赖</h3>
+<h4 id="安装libaio">安装libaio</h4>
+<p>MySQL依赖libaio，首先要安装libaio，CentOS可以用以下命令安装</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum <span class="operator"><span class="keyword">install</span> libaio</span></div></pre></td></tr></table></figure>
+
+<h4 id="安装perl">安装perl</h4>
+<p>因为MySQL的安装脚本是perl脚本，若没有perl解释器，需要先安装</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">yum install <span class="keyword">perl</span></div><div class="line">yum install <span class="keyword">perl</span>-DBI</div><div class="line">yum install <span class="keyword">perl</span>-DBD-MySQL</div></pre></td></tr></table></figure>
+
+<h3 id="安装MySQL-1">安装MySQL</h3>
+<h4 id="下载解压MySQL">下载解压MySQL</h4>
+<p>从<a href="http://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.24-linux-glibc2.5-x86_64.tar.gz" target="_blank" rel="external">这里</a>下载64位的MySQL程序包，然后解压</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="title">tar</span> xvf mysql-<span class="number">5</span>.<span class="number">6</span>.<span class="number">24</span>-linux-glibc2.<span class="number">5</span>-x86_64.tar.gz</div></pre></td></tr></table></figure>
+
+<p>将目录名改为mysql</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="title">mv</span> mysql-<span class="number">5</span>.<span class="number">6</span>.<span class="number">24</span>-linux-glibc2.<span class="number">5</span>-x86_64 mysql</div></pre></td></tr></table></figure>
+
+<p>然后将mysql移动到/usr/local下</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mv .<span class="regexp">/myqsl /</span>usr<span class="regexp">/local/</span></div></pre></td></tr></table></figure>
+
+<h4 id="创建mysql系统用户">创建mysql系统用户</h4>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="title">groupadd</span> mysql</div><div class="line">useradd -r -g mysql mysql</div></pre></td></tr></table></figure>
+
+<h4 id="授权给用户mysql">授权给用户mysql</h4>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cd /usr/local/mysql</div><div class="line">chown -<span class="variable">R</span> mysql .</div><div class="line">chgrp -<span class="variable">R</span> mysql .</div></pre></td></tr></table></figure>
+
+<h4 id="安装MySQL-2">安装MySQL</h4>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">scripts/mysql_install_db --user</span>=<span class="string">mysql</span></div></pre></td></tr></table></figure>
+
+<h4 id="启动MySQL">启动MySQL</h4>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">mkdir /var/<span class="command">log</span>/mariadb </div><div class="line">mkdir /var/<span class="command">run</span>/mariadb</div><div class="line">touch /var/<span class="command">run</span>/mariadb/dev.pid</div><div class="line">chown -R mysql /var/<span class="command">run</span>/mariadb</div><div class="line">bin/mysqld_safe <span class="comment">--user=mysql &</span></div></pre></td></tr></table></figure>
+
+<h4 id="将MySQL安装为系统服务">将MySQL安装为系统服务</h4>
+<p>安装为系统服务后，MySQL就会随机启动了</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cp support-files/mysql.<span class="keyword">server</span> /etc/init.d/mysql.<span class="keyword">server</span></div><div class="line">chmod a+x /etc/init.d/mysql.<span class="keyword">server</span></div><div class="line">chkconfig --add mysql.<span class="keyword">server</span></div><div class="line">service mysql.<span class="keyword">server</span> status</div></pre></td></tr></table></figure>
+
+<h3 id="MySQL用户设置">MySQL用户设置</h3>
+<h4 id="登录MySQL">登录MySQL</h4>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./mysql -h localhost -uroot</div></pre></td></tr></table></figure>
+
+<h4 id="查看现有用户">查看现有用户</h4>
+<figure class="highlight [sql]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> <span class="keyword">User</span>,Host,<span class="keyword">Password</span> <span class="keyword">from</span> mysql.<span class="keyword">user</span>;</span></div></pre></td></tr></table></figure>
+
+<h4 id="为root用户分配密码">为root用户分配密码</h4>
+<figure class="highlight [sql]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">UPDATE</span> mysql.<span class="keyword">user</span> <span class="keyword">SET</span> <span class="keyword">Password</span> = <span class="keyword">PASSWORD</span>(<span class="string">'newpwd'</span>) <span class="keyword">WHERE</span> <span class="keyword">User</span> = <span class="string">'root'</span>;</span></div><div class="line"><span class="operator"><span class="keyword">FLUSH</span> <span class="keyword">PRIVILEGES</span>;</span></div></pre></td></tr></table></figure>
+
+<h4 id="移除匿名用户">移除匿名用户</h4>
+<figure class="highlight [sql]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">DROP</span> <span class="keyword">USER</span> <span class="string">''</span>@<span class="string">'localhost'</span>;</span></div><div class="line"><span class="operator"><span class="keyword">DROP</span> <span class="keyword">USER</span> <span class="string">''</span>@<span class="string">'localhost.localdomain'</span>;</span></div></pre></td></tr></table></figure>
+
+<h4 id="去掉测试的权限">去掉测试的权限</h4>
+<figure class="highlight [sql]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> mysql.db <span class="keyword">WHERE</span> Db <span class="keyword">LIKE</span> <span class="string">'test%'</span>;</span></div><div class="line"><span class="operator"><span class="keyword">FLUSH</span> <span class="keyword">PRIVILEGES</span>;</span></div><div class="line"><span class="operator"><span class="keyword">DROP</span> <span class="keyword">DATABASE</span> test;</span></div></pre></td></tr></table></figure>
+
+<h4 id="查看数据库所有用户">查看数据库所有用户</h4>
+<figure class="highlight [sql]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> <span class="keyword">CONCAT</span>(<span class="string">'User: '''</span>,<span class="keyword">user</span>,<span class="string">'''@'''</span>,host,<span class="string">''';'</span>) <span class="keyword">AS</span> <span class="keyword">query</span> <span class="keyword">FROM</span> mysql.<span class="keyword">user</span>;</span></div></pre></td></tr></table></figure>
+
+<h4 id="查看某用户的权限">查看某用户的权限</h4>
+<figure class="highlight [sql]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">show</span> <span class="keyword">grants</span> <span class="keyword">for</span> root;</span></div></pre></td></tr></table></figure>
+
+<h3 id="打开远程访问">打开远程访问</h3>
+<h4 id="将root用户授权给指定ip访问">将root用户授权给指定ip访问</h4>
+<p>%代表任意ip，需要指定可以替换成特定的ip</p>
+<figure class="highlight [sql]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">GRANT</span> <span class="keyword">ALL</span> <span class="keyword">PRIVILEGES</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> root@<span class="string">"%"</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">"root"</span>;</span></div><div class="line"><span class="operator"><span class="keyword">UPDATE</span> mysql.<span class="keyword">user</span> <span class="keyword">SET</span> <span class="keyword">Password</span> = <span class="keyword">PASSWORD</span>(<span class="string">'newpwd'</span>) <span class="keyword">WHERE</span> <span class="keyword">User</span> = <span class="string">'root'</span>;</span></div><div class="line"><span class="operator"><span class="keyword">flush</span> <span class="keyword">privileges</span>;</span></div></pre></td></tr></table></figure>
+
+<h4 id="打开防火墙">打开防火墙</h4>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">firewall</span><span class="literal">-</span><span class="comment">cmd</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">query</span><span class="literal">-</span><span class="comment">port=3306/tcp</span></div><div class="line"><span class="comment">firewall</span><span class="literal">-</span><span class="comment">cmd</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">add</span><span class="literal">-</span><span class="comment">port=3306/tcp</span></div></pre></td></tr></table></figure>
+
+<h4 id="解决中文乱码">解决中文乱码</h4>
+<p>中文乱码的根源出在系统各处编码不统一，这里我们统一使用UTF8编码解决此问题，在MySQL配置中加入以下部分</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[client]</div><div class="line">default-character-set=utf8</div><div class="line"></div><div class="line">[mysql]</div><div class="line">default-character-set=utf8</div><div class="line"></div><div class="line">[mysqld]</div><div class="line">character-set-server=utf8</div><div class="line"><span class="keyword">...</span></div></pre></td></tr></table></figure>
+
+<h2 id="安装Tomcat">安装Tomcat</h2>
+<h3 id="安装JRE">安装JRE</h3>
+<h4 id="解压安装包">解压安装包</h4>
+<p>从<a href="http://download.oracle.com/otn-pub/java/jdk/7u80-b15/server-jre-7u80-linux-x64.tar.gz?AuthParam=1431401329_7d3d1b0277f38fffa59a24793dbd7361" target="_blank" rel="external">这里</a>下载JRE，然后解压</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">tar xvf server-jre-<span class="number">7</span>u8<span class="number">0</span>-linux-x64.tar.gz</div><div class="line"><span class="keyword">mkdir</span> /usr/<span class="keyword">local</span>/java</div><div class="line">mv jdk1.<span class="number">7.0_80</span> /usr/<span class="keyword">local</span>/java/</div></pre></td></tr></table></figure>
+
+<h4 id="设置环境变量">设置环境变量</h4>
+<p>在/etc/profile末尾加入如下内容，然后执行source /etc/profile</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="constant">JAVA_HOME</span>=<span class="regexp">/usr/local</span><span class="regexp">/java/jdk</span>1.<span class="number">7.0_80</span></div><div class="line"><span class="constant">CLASSPATH</span>=<span class="variable">$JAVA_HOME</span>/<span class="symbol">lib:</span><span class="variable">$JAVA_HOME</span>/jre/lib</div><div class="line"><span class="constant">PATH</span>=<span class="variable">$PATH</span><span class="symbol">:</span><span class="variable">$JAVA_HOME</span>/<span class="symbol">bin:</span><span class="variable">$JAVA_HOME</span>/jre/bin</div><div class="line">export <span class="constant">PATH</span> <span class="constant">CLASSPATH</span> <span class="constant">JAVA_HOME</span></div></pre></td></tr></table></figure>
+
+<h3 id="安装Tomcat-1">安装Tomcat</h3>
+<h4 id="下载解压Tomcat">下载解压Tomcat</h4>
+<p>从<a href="http://apache.fayea.com/tomcat/tomcat-8/v8.0.22/bin/apache-tomcat-8.0.22.tar.gz" target="_blank" rel="external">这里</a>下载Tomcat，然后解压</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">tar xvf apache-tomcat-<span class="number">8.0</span><span class="number">.22</span>.tar.gz</div><div class="line">mv apache-tomcat-<span class="number">8.0</span><span class="number">.22</span> tomcat</div><div class="line">mv tomcat /usr/<span class="keyword">local</span>/</div></pre></td></tr></table></figure>
+
+<h4 id="修改端口">修改端口</h4>
+<p>将tomcat/conf/server.xml中这一行</p>
+<figure class="highlight [xml]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;Connector <span class="variable">port=</span><span class="string">"8080"</span> <span class="variable">protocol=</span><span class="string">"HTTP/1.1"</span></div><div class="line">               <span class="variable">connectionTimeout=</span><span class="string">"20000"</span></div><div class="line">               <span class="variable">redirectPort=</span><span class="string">"8443"</span> /&gt;</div></pre></td></tr></table></figure>
+
+<p>改为</p>
+<figure class="highlight [xml]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;Connector <span class="variable">port=</span><span class="string">"80"</span> <span class="variable">protocol=</span><span class="string">"HTTP/1.1"</span></div><div class="line">               <span class="variable">connectionTimeout=</span><span class="string">"20000"</span></div><div class="line">               <span class="variable">redirectPort=</span><span class="string">"8443"</span> /&gt;</div></pre></td></tr></table></figure>
+
+<h4 id="启动Tomcat">启动Tomcat</h4>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bin/startup.<span class="keyword">sh</span></div></pre></td></tr></table></figure>
+
+<h4 id="打开防火墙端口">打开防火墙端口</h4>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">firewall</span><span class="literal">-</span><span class="comment">cmd</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">query</span><span class="literal">-</span><span class="comment">port=80/tcp</span></div><div class="line"><span class="comment">firewall</span><span class="literal">-</span><span class="comment">cmd</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">add</span><span class="literal">-</span><span class="comment">port=80/tcp</span></div></pre></td></tr></table></figure>
+
+<p>通过浏览器打开机器的ip，已经可以看到tomcat的界面了。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="安装MySQL">安装MySQL</h2>
+<p>MySQL的安装参考了官方的安装文档<br><a href="http://dev.mysql.com/doc/refman/5.6/en/binary-installation.html" target="_bl]]>
+    </summary>
+    
+      <category term="CentOS Linux MySQL Tomcat" scheme="http://elvin.im/tags/CentOS-Linux-MySQL-Tomcat/"/>
+    
+      <category term="Linux" scheme="http://elvin.im/categories/Linux/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[使用参数占位符查询防止SQL/HQL注入]]></title>
