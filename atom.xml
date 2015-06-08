@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://elvin.im/"/>
-  <updated>2015-05-15T12:05:06.500Z</updated>
+  <updated>2015-06-08T11:18:07.020Z</updated>
   <id>http://elvin.im/</id>
   
   <author>
@@ -15,11 +15,217 @@
   <generator uri="http://zespia.tw/hexo/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[MySQL索引简单研究]]></title>
+    <link href="http://elvin.im/2015/06/05/MySQL%E7%B4%A2%E5%BC%95%E7%AE%80%E5%8D%95%E7%A0%94%E7%A9%B6/"/>
+    <id>http://elvin.im/2015/06/05/MySQL索引简单研究/</id>
+    <published>2015-06-05T11:16:16.000Z</published>
+    <updated>2015-06-08T11:17:36.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="创建测试表">创建测试表</h2>
+<p>创建一个待测试的表test_table，数据如下</p>
+<pre><code><span class="code">+----+</span>----------<span class="code">+----------+</span>----------+
+<span class="header">| id | column_a | column_b | column_c |
++----+----------+----------+----------+</span>
+|  1 | A1       | B1       | C1       |
+|  2 | A2       | B2       | C2       |
+|  3 | A3       | B3       | C3       |
+|  4 | A4       | B4       | C4       |
+|  5 | A5       | B5       | C5       |
+|  6 | A6       | B6       | C6       |
+|  7 | A7       | B7       | C7       |
+|  8 | A8       | B8       | C8       |
+|  9 | A9       | B9       | C9       |
+| 10 | A10      | B10      | C10      |
+| 11 | A11      | B11      | C11      |
+| 12 | A12      | B12      | C12      |
+| 13 | A13      | B13      | C13      |
+| 14 | A14      | B14      | C14      |
+| 15 | A15      | B15      | C15      |
+<span class="header">| 16 | A16      | B16      | C16      |
++----+----------+----------+----------+</span>
+</code></pre><h2 id="不创建任何索引的情况下">不创建任何索引的情况下</h2>
+<h3 id="使用id查询">使用id查询</h3>
+<p>由于id被设置为主键，会有索引存在，直接用id查询应该会走索引</p>
+<pre><code>mysql&gt; explain select * from test_table where id = <span class="number">1</span>
+;
++----+-------------+------------+-------+---------------+---------+---------+-------+------+-------+
+<span class="localvars">| id | select_type | table      | type  | possible_keys | key     | key_len | ref   | rows |</span> <span class="class">Extra</span> |
++----+-------------+------------+-------+---------------+---------+---------+-------+------+-------+
+|  <span class="number">1</span> | <span class="class">SIMPLE</span>      <span class="localvars">| test_table | const |</span> <span class="class">PRIMARY</span>       | <span class="class">PRIMARY</span> | <span class="number">4</span>       <span class="localvars">| const |</span>    <span class="number">1</span> | <span class="class">NULL</span>  |
++----+-------------+------------+-------+---------------+---------+---------+-------+------+-------+
+</code></pre><p>通过执行计划可以看到用id主键查询确实会走索引，而且由于id = 1唯一确定了一条记录，该查询变成了一个常量查询。</p>
+<pre><code>mysql&gt; explain select * from test_table where id &gt; <span class="number">1</span>
+    -&gt; ;
++----+-------------+------------+-------+---------------+---------+---------+------+------+-------------+
+<span class="localvars">| id | select_type | table      | type  | possible_keys | key     | key_len | ref  | rows |</span> <span class="class">Extra</span>       |
++----+-------------+------------+-------+---------------+---------+---------+------+------+-------------+
+|  <span class="number">1</span> | <span class="class">SIMPLE</span>      <span class="localvars">| test_table | range |</span> <span class="class">PRIMARY</span>       | <span class="class">PRIMARY</span> | <span class="number">4</span>       | <span class="class">NULL</span> |   <span class="number">15</span> | <span class="class">Using</span> where |
++----+-------------+------------+-------+---------------+---------+---------+------+------+-------------+
+</code></pre><p>这里使用id &gt; 1依然会走索引查询</p>
+<pre><code><span class="header">mysql&gt; explain select * from test_table where id != 1;
++----+-------------+------------+-------+---------------+---------+---------+------+------+-------------+</span>
+<span class="header">| id | select_type | table      | type  | possible_keys | key     | key_len | ref  | rows | Extra       |
++----+-------------+------------+-------+---------------+---------+---------+------+------+-------------+</span>
+<span class="header">|  1 | SIMPLE      | test_table | range | PRIMARY       | PRIMARY | 4       | NULL |   16 | Using where |
++----+-------------+------------+-------+---------------+---------+---------+------+------+-------------+</span>
+</code></pre><p>使用id != 1还是会走索引查询</p>
+<pre><code>mysql&gt; explain select * from test_table where id + <span class="number">1</span> = <span class="number">2</span>
+;
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+
+<span class="localvars">| id | select_type | table      | type | possible_keys | key  | key_len | ref  | rows |</span> <span class="class">Extra</span>       |
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+
+|  <span class="number">1</span> | <span class="class">SIMPLE</span>      <span class="localvars">| test_table |</span> <span class="class">ALL</span>  | <span class="class">NULL</span>          | <span class="class">NULL</span> | <span class="class">NULL</span>    | <span class="class">NULL</span> |   <span class="number">16</span> | <span class="class">Using</span> where |
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+
+</code></pre><p>但是使用id + 1 = 2就会变成全表扫描</p>
+<pre><code>mysql&gt; explain select * from test_table where id = <span class="number">2</span> - <span class="number">1</span>
+;
++----+-------------+------------+-------+---------------+---------+---------+-------+------+-------+
+<span class="localvars">| id | select_type | table      | type  | possible_keys | key     | key_len | ref   | rows |</span> <span class="class">Extra</span> |
++----+-------------+------------+-------+---------------+---------+---------+-------+------+-------+
+|  <span class="number">1</span> | <span class="class">SIMPLE</span>      <span class="localvars">| test_table | const |</span> <span class="class">PRIMARY</span>       | <span class="class">PRIMARY</span> | <span class="number">4</span>       <span class="localvars">| const |</span>    <span class="number">1</span> | <span class="class">NULL</span>  |
++----+-------------+------------+-------+---------------+---------+---------+-------+------+-------+
+</code></pre><p>若将id + 1 = 2变换成id = 2 - 1就会走索引，所以在实际编写SQL过程中不应该将索引字段计算以后再查询，Oracle的函数索引可以解决这个问题，但是MySQL不支持函数索引。</p>
+<h3 id="使用一个非id字段查询">使用一个非id字段查询</h3>
+<pre><code><span class="header">mysql&gt; explain select * from test_table where column_a = 'A1';
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+<span class="header">| id | select_type | table      | type | possible_keys | key  | key_len | ref  | rows | Extra       |
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+<span class="header">|  1 | SIMPLE      | test_table | ALL  | NULL          | NULL | NULL    | NULL |   16 | Using where |
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+</code></pre><p>使用没有索引的字段查询会走全表扫描</p>
+<h2 id="为查询字段加上索引">为查询字段加上索引</h2>
+<h3 id="索引字段查询">索引字段查询</h3>
+<p>为column_a加上索引</p>
+<pre><code><span class="header">mysql&gt; explain select * from test_table where column_a = 'A1';
++----+-------------+------------+------+---------------+---------+---------+-------+------+-----------------------+</span>
+<span class="header">| id | select_type | table      | type | possible_keys | key     | key_len | ref   | rows | Extra                 |
++----+-------------+------------+------+---------------+---------+---------+-------+------+-----------------------+</span>
+<span class="header">|  1 | SIMPLE      | test_table | ref  | index_a       | index_a | 767     | const |    1 | Using index condition |
++----+-------------+------------+------+---------------+---------+---------+-------+------+-----------------------+</span>
+</code></pre><p>加上索引以后查询就变成了索引查询</p>
+<pre><code><span class="header">mysql&gt; explain select * from test_table where column_a &gt; 'A1';
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+<span class="header">| id | select_type | table      | type | possible_keys | key  | key_len | ref  | rows | Extra       |
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+<span class="header">|  1 | SIMPLE      | test_table | ALL  | index_a       | NULL | NULL    | NULL |   16 | Using where |
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+
+<span class="header">mysql&gt; explain select * from test_table where column_a &lt;&gt; 'A1';
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+<span class="header">| id | select_type | table      | type | possible_keys | key  | key_len | ref  | rows | Extra       |
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+<span class="header">|  1 | SIMPLE      | test_table | ALL  | index_a       | NULL | NULL    | NULL |   16 | Using where |
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+</code></pre><p>与int类型的id字段不同，字符串类型的字段用&gt;或者&lt;&gt;查询会变成全表扫描</p>
+<pre><code>mysql&gt; explain select * <span class="keyword">from</span> test_table where column_a = '<span class="type">A1</span>' <span class="keyword">and</span> column_b = '<span class="type">B1</span>
+';
++----+-------------+------------+------+---------------+---------+---------+-------+------+------------------------------------+
+| id | select_type | table      | <span class="keyword">type</span> | possible_keys | key     | key_len | <span class="keyword">ref</span>   | rows | <span class="type">Extra</span>                              |
++----+-------------+------------+------+---------------+---------+---------+-------+------+------------------------------------+
+|  <span class="number">1</span> | <span class="type">SIMPLE</span>      | test_table | <span class="keyword">ref</span>  | index_a       | index_a | <span class="number">767</span>     | <span class="keyword">const</span> |    <span class="number">1</span> | <span class="type">Using</span> index condition; <span class="type">Using</span> where |
++----+-------------+------------+------+---------------+---------+---------+-------+------+------------------------------------+
+</code></pre><p>索引字段会优先走索引</p>
+<h2 id="为多个查询字段加上组合索引">为多个查询字段加上组合索引</h2>
+<p>为column_a,column_b加上组合索引</p>
+<h3 id="使用组合索引全部字段查询">使用组合索引全部字段查询</h3>
+<pre><code><span class="header">mysql&gt; explain select * from test_table where column_a = 'A1' and column_b = 'B1';
++----+-------------+------------+------+---------------+----------+---------+-------------+------+-----------------------+</span>
+<span class="header">| id | select_type | table      | type | possible_keys | key      | key_len | ref         | rows | Extra                 |
++----+-------------+------------+------+---------------+----------+---------+-------------+------+-----------------------+</span>
+<span class="header">|  1 | SIMPLE      | test_table | ref  | index_ab      | index_ab | 1534    | const,const |    1 | Using index condition |
++----+-------------+------------+------+---------------+----------+---------+-------------+------+-----------------------+</span>
+</code></pre><p>可以看到两个字段都走了索引</p>
+<h3 id="单独使用组合索引第一个字段查询">单独使用组合索引第一个字段查询</h3>
+<pre><code>mysql&gt; explain select * from test<span class="emphasis">_table where column_</span>a = <span class="emphasis">'A1'</span>
+<span class="header">;
++----+-------------+------------+------+---------------+----------+---------+-------+------+-----------------------+</span>
+<span class="header">| id | select_type | table      | type | possible_keys | key      | key_len | ref   | rows | Extra                 |
++----+-------------+------------+------+---------------+----------+---------+-------+------+-----------------------+</span>
+<span class="header">|  1 | SIMPLE      | test_table | ref  | index_ab      | index_ab | 767     | const |    1 | Using index condition |
++----+-------------+------------+------+---------------+----------+---------+-------+------+-----------------------+</span>
+</code></pre><p>单独使用组合索引第一个字段查询是会走索引查询的</p>
+<h3 id="单独使用组合索引后续字段查询">单独使用组合索引后续字段查询</h3>
+<pre><code><span class="header">mysql&gt; explain select * from test_table where column_b = 'B1';
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+<span class="header">| id | select_type | table      | type | possible_keys | key  | key_len | ref  | rows | Extra       |
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+<span class="header">|  1 | SIMPLE      | test_table | ALL  | NULL          | NULL | NULL    | NULL |   16 | Using where |
++----+-------------+------------+------+---------------+------+---------+------+------+-------------+</span>
+</code></pre><p>虽然column_b在组合索引index_ab中，但是由于它是第二个字段，所以它并不会走索引。</p>
+<p>假如建立一个组合索引index_abc，索引字段为column_a,column_b,column_c，使用column_a查询、column_a+column_b查询、column_a+column_b+column_c查询都会走索引，但是column_b查询、column_b+column_c查询、column_c查询都不会走索引。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="创建测试表">创建测试表</h2>
+<p>创建一个待测试的表test_table，数据如下</p>
+<pre><code><span class="code">+----+</span>----------<span class="code">+---------]]>
+    </summary>
+    
+      <category term="MySQL 数据库 索引" scheme="http://elvin.im/tags/MySQL-%E6%95%B0%E6%8D%AE%E5%BA%93-%E7%B4%A2%E5%BC%95/"/>
+    
+      <category term="MySQL" scheme="http://elvin.im/categories/MySQL/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Linux安装Nexus服务器]]></title>
+    <link href="http://elvin.im/2015/06/03/Linux%E5%AE%89%E8%A3%85Nexus%E6%9C%8D%E5%8A%A1%E5%99%A8/"/>
+    <id>http://elvin.im/2015/06/03/Linux安装Nexus服务器/</id>
+    <published>2015-06-03T11:14:39.000Z</published>
+    <updated>2015-06-08T11:15:46.000Z</updated>
+    <content type="html"><![CDATA[<p>系统版本： CentOS 7</p>
+<h2 id="安装Nexus">安装Nexus</h2>
+<h3 id="下载Nexus">下载Nexus</h3>
+<p>首先从<a href="https://sonatype-download.global.ssl.fastly.net/nexus/oss/nexus-2.11.1-01-bundle.tar.gz" target="_blank" rel="external">这里</a>下载Nexus服务器程序，可能需要爬梯子才能下载。</p>
+<h3 id="解压到指定目录">解压到指定目录</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">tar xvf nexus-<span class="number">2.11</span><span class="number">.1</span>-<span class="number">01</span>-bundle.tar.gz</div><div class="line">mv nexus-<span class="number">2.11</span><span class="number">.1</span>-<span class="number">01</span> /usr/<span class="keyword">local</span>/nexus</div></pre></td></tr></table></figure>
+
+<h3 id="设置端口等参数">设置端口等参数</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cd</span> /usr/local/nexus</div><div class="line"><span class="keyword">vi</span> <span class="keyword">conf</span>/nexus.properties</div></pre></td></tr></table></figure>
+
+<h3 id="新建nexus系统用户">新建nexus系统用户</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="title">groupadd</span> mysql</div><div class="line">useradd -r -m -g mysql mysql</div></pre></td></tr></table></figure>
+
+<h3 id="指定Nexus以nexus用户启动">指定Nexus以nexus用户启动</h3>
+<p>修改bin/nexus文件如下</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="variable">RUN_AS_USER=</span>nexus</div><div class="line"><span class="variable">NEXUS_HOME=</span>/usr/local/nexus</div><div class="line"><span class="variable">PIDDIR=</span><span class="string">"<span class="subst">${NEXUS_HOME}</span>"</span></div></pre></td></tr></table></figure>
+
+<p>然后将目录权限赋给nexus用户</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">chown</span> -R nexus /usr/<span class="keyword">local</span>/nexus</div></pre></td></tr></table></figure>
+
+<h3 id="创建Nexus工作目录">创建Nexus工作目录</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">mkdir</span> /usr/<span class="keyword">local</span>/sonatype-work</div><div class="line"><span class="keyword">chown</span> -R nexus /usr/<span class="keyword">local</span>/sonatype-work</div></pre></td></tr></table></figure>
+
+<h3 id="将Nexus设置成Linux系统服务">将Nexus设置成Linux系统服务</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cp</span> bin/nexus /etc/init.<span class="keyword">d</span>/</div><div class="line">chkconfig --<span class="built_in">add</span> nexus</div><div class="line">service nexus start</div></pre></td></tr></table></figure>
+
+<h3 id="安装完成">安装完成</h3>
+<p>安装完成以后在浏览器输入<a href="http://192.168.1.145:8081/nexus即可访问Nexus。" target="_blank" rel="external">http://192.168.1.145:8081/nexus即可访问Nexus。</a><br>用管理员账户admin/admin123可以管理仓库。</p>
+<h2 id="客户端Maven使用Nexus服务">客户端Maven使用Nexus服务</h2>
+<h3 id="修改Maven的配置文件">修改Maven的配置文件</h3>
+<p>修改MAVEN_HOME/conf/settings.xml，在相应字段加入以下内容</p>
+<figure class="highlight [xml]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">settings</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">mirrors</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">mirror</span>&gt;</span></div><div class="line">      <span class="comment">&lt;!--This sends everything else to /public --&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">id</span>&gt;</span>nexus<span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">mirrorOf</span>&gt;</span>*<span class="tag">&lt;/<span class="title">mirrorOf</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://localhost:8081/nexus/content/groups/public<span class="tag">&lt;/<span class="title">url</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">mirror</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="title">mirrors</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">profiles</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">profile</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">id</span>&gt;</span>nexus<span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">      <span class="comment">&lt;!--Enable snapshots for the built in central repo to direct --&gt;</span></div><div class="line">      <span class="comment">&lt;!--all requests to nexus via the mirror --&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">repositories</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">repository</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">id</span>&gt;</span>central<span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://central<span class="tag">&lt;/<span class="title">url</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">releases</span>&gt;</span><span class="tag">&lt;<span class="title">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="title">enabled</span>&gt;</span><span class="tag">&lt;/<span class="title">releases</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">snapshots</span>&gt;</span><span class="tag">&lt;<span class="title">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="title">enabled</span>&gt;</span><span class="tag">&lt;/<span class="title">snapshots</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">repository</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="title">repositories</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="title">pluginRepositories</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">pluginRepository</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">id</span>&gt;</span>central<span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://central<span class="tag">&lt;/<span class="title">url</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">releases</span>&gt;</span><span class="tag">&lt;<span class="title">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="title">enabled</span>&gt;</span><span class="tag">&lt;/<span class="title">releases</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">snapshots</span>&gt;</span><span class="tag">&lt;<span class="title">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="title">enabled</span>&gt;</span><span class="tag">&lt;/<span class="title">snapshots</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">pluginRepository</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="title">pluginRepositories</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">profile</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="title">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">activeProfiles</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!--make the profile active all the time --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">activeProfile</span>&gt;</span>nexus<span class="tag">&lt;/<span class="title">activeProfile</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="title">activeProfiles</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">settings</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>在Eclipse中同样将Maven的配置文件指定为刚刚修改好的。</p>
+<p>到这里Nexus服务器的安装与使用都已经完成了。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>系统版本： CentOS 7</p>
+<h2 id="安装Nexus">安装Nexus</h2>
+<h3 id="下载Nexus">下载Nexus</h3>
+<p>首先从<a href="https://sonatype-download.global.ssl.fastly]]>
+    </summary>
+    
+      <category term="Maven Nexus" scheme="http://elvin.im/tags/Maven-Nexus/"/>
+    
+      <category term="Maven" scheme="http://elvin.im/categories/Maven/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[CentOS命令备忘录]]></title>
     <link href="http://elvin.im/2015/05/15/CentOS%E5%91%BD%E4%BB%A4%E5%A4%87%E5%BF%98%E5%BD%95/"/>
     <id>http://elvin.im/2015/05/15/CentOS命令备忘录/</id>
     <published>2015-05-15T11:58:23.000Z</published>
-    <updated>2015-05-15T12:00:42.000Z</updated>
+    <updated>2015-06-08T11:14:07.000Z</updated>
     <content type="html"><![CDATA[<h2 id="系统资源监控">系统资源监控</h2>
 <h3 id="CPU和内存">CPU和内存</h3>
 <p>top命令有些类似windows任务管理器</p>
@@ -44,7 +250,20 @@
 <figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">firewall-cmd --query-port</span>=<span class="string">3306/tcp</span></div></pre></td></tr></table></figure>
 
 <h3 id="打开/关闭端口">打开/关闭端口</h3>
-<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">firewall-cmd <span class="variable">--add-port=</span><span class="number">3306</span>/tcp    <span class="comment">#打开端口</span></div><div class="line">firewall-cmd <span class="variable">--remove-port=</span><span class="number">3306</span>/tcp    <span class="comment">#关闭端口</span></div></pre></td></tr></table></figure>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">firewall-cmd <span class="variable">--add-port=</span><span class="number">3306</span>/tcp    <span class="comment">#临时打开端口</span></div><div class="line">firewall-cmd <span class="variable">--remove-port=</span><span class="number">3306</span>/tcp    <span class="comment">#临时关闭端口</span></div><div class="line">firewall-cmd <span class="variable">--add-port=</span><span class="number">3306</span>/tcp --permenant    <span class="comment">#永久打开端口</span></div><div class="line">firewall-cmd <span class="variable">--remove-port=</span><span class="number">3306</span>/tcp --permenant    <span class="comment">#永久关闭端口</span></div></pre></td></tr></table></figure>
+
+<h2 id="时间设置">时间设置</h2>
+<h3 id="查看当前系统时间和时区">查看当前系统时间和时区</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">timedatectl</div></pre></td></tr></table></figure>
+
+<h3 id="同步网络时间">同步网络时间</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum <span class="keyword">install</span> ntpdate <span class="comment">#若命令不存在则安装</span></div><div class="line">ntpdate us.pool.ntp.org</div></pre></td></tr></table></figure>
+
+<h3 id="定时同步">定时同步</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">crontab <span class="operator">-e</span></div></pre></td></tr></table></figure>
+
+<p>运行以上命令后添加一下cron task，就会每30分钟运行一次同步时间命令</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">*</span>/30 <span class="keyword">*</span> <span class="keyword">*</span> <span class="keyword">*</span> <span class="keyword">*</span> /sbin/ntpdate us.pool.ntp.org</div></pre></td></tr></table></figure>
 
 ]]></content>
     <summary type="html">

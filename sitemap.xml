@@ -2,6 +2,21 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://elvin.im/2015/06/05/MySQL%E7%B4%A2%E5%BC%95%E7%AE%80%E5%8D%95%E7%A0%94%E7%A9%B6/</loc>
+    <lastmod>2015-06-08T11:17:36.000Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://elvin.im/2015/06/03/Linux%E5%AE%89%E8%A3%85Nexus%E6%9C%8D%E5%8A%A1%E5%99%A8/</loc>
+    <lastmod>2015-06-08T11:15:46.000Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://elvin.im/2015/05/15/CentOS%E5%91%BD%E4%BB%A4%E5%A4%87%E5%BF%98%E5%BD%95/</loc>
+    <lastmod>2015-06-08T11:14:07.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://elvin.im/about/index.html</loc>
     <lastmod>2015-05-15T12:04:58.000Z</lastmod>
   </url>
@@ -9,11 +24,6 @@
   <url>
     <loc>http://elvin.im/2015/05/13/CentOS-7%E4%B8%8BMySQL%E4%B8%8ETomcat%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B%E5%A4%87%E4%BB%BD/</loc>
     <lastmod>2015-05-15T12:00:55.000Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://elvin.im/2015/05/15/CentOS%E5%91%BD%E4%BB%A4%E5%A4%87%E5%BF%98%E5%BD%95/</loc>
-    <lastmod>2015-05-15T12:00:42.000Z</lastmod>
   </url>
   
   <url>

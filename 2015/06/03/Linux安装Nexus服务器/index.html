@@ -1,0 +1,492 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux安装Nexus服务器 | Elvin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Elvin Guan">
+    
+    <meta name="description" content="系统版本： CentOS 7
+安装Nexus
+下载Nexus
+首先从这里下载Nexus服务器程序，可能需要爬梯子才能下载。
+解压到指定目录
+12tar xvf nexus-2.11.1-01-bundle.tar.gzmv nexus-2.11.1-01 /usr/local/nexus
+
+设置端口">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="Elvin Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Elvin Blog" title="Elvin Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Elvin Blog">Elvin Blog</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:elvin.im">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/06/03/Linux安装Nexus服务器/" title="Linux安装Nexus服务器" itemprop="url">Linux安装Nexus服务器</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://elvin.im/about" title="Elvin Guan" target="_blank" itemprop="author">Elvin Guan</a>
+		
+  <p class="article-time">
+    <time datetime="2015-06-03T11:14:39.000Z" itemprop="datePublished"> 发表于 6月 3 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装Nexus"><span class="toc-number">1.</span> <span class="toc-text">安装Nexus</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#下载Nexus"><span class="toc-number">1.1.</span> <span class="toc-text">下载Nexus</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解压到指定目录"><span class="toc-number">1.2.</span> <span class="toc-text">解压到指定目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置端口等参数"><span class="toc-number">1.3.</span> <span class="toc-text">设置端口等参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#新建nexus系统用户"><span class="toc-number">1.4.</span> <span class="toc-text">新建nexus系统用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#指定Nexus以nexus用户启动"><span class="toc-number">1.5.</span> <span class="toc-text">指定Nexus以nexus用户启动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建Nexus工作目录"><span class="toc-number">1.6.</span> <span class="toc-text">创建Nexus工作目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#将Nexus设置成Linux系统服务"><span class="toc-number">1.7.</span> <span class="toc-text">将Nexus设置成Linux系统服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装完成"><span class="toc-number">1.8.</span> <span class="toc-text">安装完成</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#客户端Maven使用Nexus服务"><span class="toc-number">2.</span> <span class="toc-text">客户端Maven使用Nexus服务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#修改Maven的配置文件"><span class="toc-number">2.1.</span> <span class="toc-text">修改Maven的配置文件</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<p>系统版本： CentOS 7</p>
+<h2 id="安装Nexus">安装Nexus</h2>
+<h3 id="下载Nexus">下载Nexus</h3>
+<p>首先从<a href="https://sonatype-download.global.ssl.fastly.net/nexus/oss/nexus-2.11.1-01-bundle.tar.gz" target="_blank" rel="external">这里</a>下载Nexus服务器程序，可能需要爬梯子才能下载。</p>
+<h3 id="解压到指定目录">解压到指定目录</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">tar xvf nexus-<span class="number">2.11</span><span class="number">.1</span>-<span class="number">01</span>-bundle.tar.gz</div><div class="line">mv nexus-<span class="number">2.11</span><span class="number">.1</span>-<span class="number">01</span> /usr/<span class="keyword">local</span>/nexus</div></pre></td></tr></table></figure>
+
+<h3 id="设置端口等参数">设置端口等参数</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cd</span> /usr/local/nexus</div><div class="line"><span class="keyword">vi</span> <span class="keyword">conf</span>/nexus.properties</div></pre></td></tr></table></figure>
+
+<h3 id="新建nexus系统用户">新建nexus系统用户</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="title">groupadd</span> mysql</div><div class="line">useradd -r -m -g mysql mysql</div></pre></td></tr></table></figure>
+
+<h3 id="指定Nexus以nexus用户启动">指定Nexus以nexus用户启动</h3>
+<p>修改bin/nexus文件如下</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="variable">RUN_AS_USER=</span>nexus</div><div class="line"><span class="variable">NEXUS_HOME=</span>/usr/local/nexus</div><div class="line"><span class="variable">PIDDIR=</span><span class="string">"<span class="subst">${NEXUS_HOME}</span>"</span></div></pre></td></tr></table></figure>
+
+<p>然后将目录权限赋给nexus用户</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">chown</span> -R nexus /usr/<span class="keyword">local</span>/nexus</div></pre></td></tr></table></figure>
+
+<h3 id="创建Nexus工作目录">创建Nexus工作目录</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">mkdir</span> /usr/<span class="keyword">local</span>/sonatype-work</div><div class="line"><span class="keyword">chown</span> -R nexus /usr/<span class="keyword">local</span>/sonatype-work</div></pre></td></tr></table></figure>
+
+<h3 id="将Nexus设置成Linux系统服务">将Nexus设置成Linux系统服务</h3>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cp</span> bin/nexus /etc/init.<span class="keyword">d</span>/</div><div class="line">chkconfig --<span class="built_in">add</span> nexus</div><div class="line">service nexus start</div></pre></td></tr></table></figure>
+
+<h3 id="安装完成">安装完成</h3>
+<p>安装完成以后在浏览器输入<a href="http://192.168.1.145:8081/nexus即可访问Nexus。" target="_blank" rel="external">http://192.168.1.145:8081/nexus即可访问Nexus。</a><br>用管理员账户admin/admin123可以管理仓库。</p>
+<h2 id="客户端Maven使用Nexus服务">客户端Maven使用Nexus服务</h2>
+<h3 id="修改Maven的配置文件">修改Maven的配置文件</h3>
+<p>修改MAVEN_HOME/conf/settings.xml，在相应字段加入以下内容</p>
+<figure class="highlight [xml]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">settings</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">mirrors</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">mirror</span>&gt;</span></div><div class="line">      <span class="comment">&lt;!--This sends everything else to /public --&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">id</span>&gt;</span>nexus<span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">mirrorOf</span>&gt;</span>*<span class="tag">&lt;/<span class="title">mirrorOf</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://localhost:8081/nexus/content/groups/public<span class="tag">&lt;/<span class="title">url</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">mirror</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="title">mirrors</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">profiles</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">profile</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">id</span>&gt;</span>nexus<span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">      <span class="comment">&lt;!--Enable snapshots for the built in central repo to direct --&gt;</span></div><div class="line">      <span class="comment">&lt;!--all requests to nexus via the mirror --&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">repositories</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">repository</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">id</span>&gt;</span>central<span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://central<span class="tag">&lt;/<span class="title">url</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">releases</span>&gt;</span><span class="tag">&lt;<span class="title">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="title">enabled</span>&gt;</span><span class="tag">&lt;/<span class="title">releases</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">snapshots</span>&gt;</span><span class="tag">&lt;<span class="title">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="title">enabled</span>&gt;</span><span class="tag">&lt;/<span class="title">snapshots</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">repository</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="title">repositories</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="title">pluginRepositories</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">pluginRepository</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">id</span>&gt;</span>central<span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://central<span class="tag">&lt;/<span class="title">url</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">releases</span>&gt;</span><span class="tag">&lt;<span class="title">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="title">enabled</span>&gt;</span><span class="tag">&lt;/<span class="title">releases</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="title">snapshots</span>&gt;</span><span class="tag">&lt;<span class="title">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="title">enabled</span>&gt;</span><span class="tag">&lt;/<span class="title">snapshots</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">pluginRepository</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="title">pluginRepositories</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">profile</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="title">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">activeProfiles</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!--make the profile active all the time --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">activeProfile</span>&gt;</span>nexus<span class="tag">&lt;/<span class="title">activeProfile</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="title">activeProfiles</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">settings</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>在Eclipse中同样将Maven的配置文件指定为刚刚修改好的。</p>
+<p>到这里Nexus服务器的安装与使用都已经完成了。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Maven/">Maven</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Maven-Nexus/">Maven Nexus</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://elvin.im/2015/06/03/Linux安装Nexus服务器/" data-title="Linux安装Nexus服务器 | Elvin Blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/06/05/MySQL索引简单研究/" title="MySQL索引简单研究">
+  <strong>上一篇：</strong><br/>
+  <span>
+  MySQL索引简单研究</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/05/15/CentOS命令备忘录/"  title="CentOS命令备忘录">
+ <strong>下一篇：</strong><br/> 
+ <span>CentOS命令备忘录
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装Nexus"><span class="toc-number">1.</span> <span class="toc-text">安装Nexus</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#下载Nexus"><span class="toc-number">1.1.</span> <span class="toc-text">下载Nexus</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解压到指定目录"><span class="toc-number">1.2.</span> <span class="toc-text">解压到指定目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置端口等参数"><span class="toc-number">1.3.</span> <span class="toc-text">设置端口等参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#新建nexus系统用户"><span class="toc-number">1.4.</span> <span class="toc-text">新建nexus系统用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#指定Nexus以nexus用户启动"><span class="toc-number">1.5.</span> <span class="toc-text">指定Nexus以nexus用户启动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建Nexus工作目录"><span class="toc-number">1.6.</span> <span class="toc-text">创建Nexus工作目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#将Nexus设置成Linux系统服务"><span class="toc-number">1.7.</span> <span class="toc-text">将Nexus设置成Linux系统服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装完成"><span class="toc-number">1.8.</span> <span class="toc-text">安装完成</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#客户端Maven使用Nexus服务"><span class="toc-number">2.</span> <span class="toc-text">客户端Maven使用Nexus服务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#修改Maven的配置文件"><span class="toc-number">2.1.</span> <span class="toc-text">修改Maven的配置文件</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Maven/" title="Maven">Maven<sup>1</sup></a></li>
+		
+			<li><a href="/categories/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Windows/" title="Windows">Windows<sup>1</sup></a></li>
+		
+			<li><a href="/categories/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		
+			<li><a href="/categories/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/categories/算法实现/" title="算法实现">算法实现<sup>5</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Java-POI/" title="Java POI">Java POI<sup>2</sup></a></li>
+		
+			<li><a href="/tags/MySQL-数据库-索引/" title="MySQL 数据库 索引">MySQL 数据库 索引<sup>1</sup></a></li>
+		
+			<li><a href="/tags/CentOS-Linux-MySQL-Tomcat/" title="CentOS Linux MySQL Tomcat">CentOS Linux MySQL Tomcat<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hibernate-注入/" title="Hibernate 注入">Hibernate 注入<sup>1</sup></a></li>
+		
+			<li><a href="/tags/CentOS-Linux/" title="CentOS Linux">CentOS Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Maven-Nexus/" title="Maven Nexus">Maven Nexus<sup>1</sup></a></li>
+		
+			<li><a href="/tags/寻找第k小元素/" title="寻找第k小元素">寻找第k小元素<sup>1</sup></a></li>
+		
+			<li><a href="/tags/HTML/" title="HTML">HTML<sup>1</sup></a></li>
+		
+			<li><a href="/tags/寻找多数元素/" title="寻找多数元素">寻找多数元素<sup>1</sup></a></li>
+		
+			<li><a href="/tags/并查集/" title="并查集">并查集<sup>1</sup></a></li>
+		
+			<li><a href="/tags/快速排序/" title="快速排序">快速排序<sup>1</sup></a></li>
+		
+			<li><a href="/tags/无线网络共享-Windows/" title="无线网络共享 Windows">无线网络共享 Windows<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hexo-github/" title="Hexo github">Hexo github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JavaScript-闭包-ExtJS/" title="JavaScript 闭包 ExtJS">JavaScript 闭包 ExtJS<sup>1</sup></a></li>
+		
+			<li><a href="/tags/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JS/" title="JS">JS<sup>1</sup></a></li>
+		
+			<li><a href="/tags/最长公共子序列/" title="最长公共子序列">最长公共子序列<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><a href="http://leorz.com" target="_blank" title="Leo">Leo's Blog</a></li>
+      <li><a href="http://hexo.io" target="_blank" title="Hexo">Hexo</a></li>
+    </ul>
+</div>
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2015 
+		
+		<a href="http://elvin.im/about" target="_blank" title="Elvin Guan">Elvin Guan</a>
+		
+		</p>
+</div>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F9cc4c1668f1879156c0627818f4e84ae' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"elvin-blog"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>
