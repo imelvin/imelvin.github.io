@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://elvin.im/"/>
-  <updated>2015-06-08T11:18:07.020Z</updated>
+  <updated>2015-06-09T11:05:19.770Z</updated>
   <id>http://elvin.im/</id>
   
   <author>
@@ -13,6 +13,42 @@
   </author>
   
   <generator uri="http://zespia.tw/hexo/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[CentOS设置Tomcat为系统服务并随机启动]]></title>
+    <link href="http://elvin.im/2015/06/09/CentOS%E8%AE%BE%E7%BD%AETomcat%E4%B8%BA%E7%B3%BB%E7%BB%9F%E6%9C%8D%E5%8A%A1%E5%B9%B6%E9%9A%8F%E6%9C%BA%E5%90%AF%E5%8A%A8/"/>
+    <id>http://elvin.im/2015/06/09/CentOS设置Tomcat为系统服务并随机启动/</id>
+    <published>2015-06-09T11:03:51.000Z</published>
+    <updated>2015-06-09T11:04:32.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="将tomcat设置为系统服务">将tomcat设置为系统服务</h2>
+<p>将catalina.sh复制到/etc/init.d下</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cd</span> /usr/local/tomcat</div><div class="line"><span class="keyword">cp</span> bin/catalina.<span class="keyword">sh</span> /etc/init.<span class="keyword">d</span>/tomcat</div></pre></td></tr></table></figure>
+
+<p>在/etc/init.d/tomcat加入以下内容（根据实际情况配置）：</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="constant">JAVA_HOME</span>=<span class="string">"/usr/local/java/jdk1.7.0_80"</span></div><div class="line"><span class="constant">CATALINA_HOME</span>=<span class="string">"/usr/local/tomcat"</span></div></pre></td></tr></table></figure>
+
+<p>到这一步了就tomcat就可以用以下命令来启动和关闭了</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">service tomcat <span class="operator"><span class="keyword">start</span></span></div><div class="line">service tomcat <span class="keyword">stop</span></div></pre></td></tr></table></figure>
+
+<h2 id="让tomcat随机启动">让tomcat随机启动</h2>
+<p>首先让/etc/init.d/tomcat支持chkconfig，加入以下内容</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor"># chkconfig: 2345 73 73</span></div><div class="line"><span class="preprocessor"># description: start or stop tomcat</span></div></pre></td></tr></table></figure>
+
+<p>然后运行以下命令即可</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chkconfig --<span class="built_in">add</span> tomcat</div></pre></td></tr></table></figure>
+
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="将tomcat设置为系统服务">将tomcat设置为系统服务</h2>
+<p>将catalina.sh复制到/etc/init.d下</p>
+<figure class="highlight [shell]"><table><tr><td class="gutte]]>
+    </summary>
+    
+      <category term="Linux Tomcat" scheme="http://elvin.im/tags/Linux-Tomcat/"/>
+    
+      <category term="Linux" scheme="http://elvin.im/categories/Linux/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[MySQL索引简单研究]]></title>
@@ -225,7 +261,7 @@
     <link href="http://elvin.im/2015/05/15/CentOS%E5%91%BD%E4%BB%A4%E5%A4%87%E5%BF%98%E5%BD%95/"/>
     <id>http://elvin.im/2015/05/15/CentOS命令备忘录/</id>
     <published>2015-05-15T11:58:23.000Z</published>
-    <updated>2015-06-08T11:14:07.000Z</updated>
+    <updated>2015-06-09T11:03:00.000Z</updated>
     <content type="html"><![CDATA[<h2 id="系统资源监控">系统资源监控</h2>
 <h3 id="CPU和内存">CPU和内存</h3>
 <p>top命令有些类似windows任务管理器</p>
@@ -250,7 +286,7 @@
 <figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">firewall-cmd --query-port</span>=<span class="string">3306/tcp</span></div></pre></td></tr></table></figure>
 
 <h3 id="打开/关闭端口">打开/关闭端口</h3>
-<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">firewall-cmd <span class="variable">--add-port=</span><span class="number">3306</span>/tcp    <span class="comment">#临时打开端口</span></div><div class="line">firewall-cmd <span class="variable">--remove-port=</span><span class="number">3306</span>/tcp    <span class="comment">#临时关闭端口</span></div><div class="line">firewall-cmd <span class="variable">--add-port=</span><span class="number">3306</span>/tcp --permenant    <span class="comment">#永久打开端口</span></div><div class="line">firewall-cmd <span class="variable">--remove-port=</span><span class="number">3306</span>/tcp --permenant    <span class="comment">#永久关闭端口</span></div></pre></td></tr></table></figure>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">firewall-cmd <span class="variable">--add-port=</span><span class="number">3306</span>/tcp    <span class="comment">#临时打开端口</span></div><div class="line">firewall-cmd <span class="variable">--remove-port=</span><span class="number">3306</span>/tcp    <span class="comment">#临时关闭端口</span></div><div class="line">firewall-cmd <span class="variable">--add-port=</span><span class="number">3306</span>/tcp --permanent    <span class="comment">#永久打开端口</span></div><div class="line">firewall-cmd <span class="variable">--remove-port=</span><span class="number">3306</span>/tcp --permanent    <span class="comment">#永久关闭端口</span></div></pre></td></tr></table></figure>
 
 <h2 id="时间设置">时间设置</h2>
 <h3 id="查看当前系统时间和时区">查看当前系统时间和时区</h3>
@@ -284,7 +320,7 @@
     <link href="http://elvin.im/2015/05/13/CentOS-7%E4%B8%8BMySQL%E4%B8%8ETomcat%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B%E5%A4%87%E4%BB%BD/"/>
     <id>http://elvin.im/2015/05/13/CentOS-7下MySQL与Tomcat环境搭建过程备份/</id>
     <published>2015-05-13T11:52:33.000Z</published>
-    <updated>2015-05-15T12:00:55.000Z</updated>
+    <updated>2015-06-09T11:02:22.000Z</updated>
     <content type="html"><![CDATA[<h2 id="安装MySQL">安装MySQL</h2>
 <p>MySQL的安装参考了官方的安装文档<br><a href="http://dev.mysql.com/doc/refman/5.6/en/binary-installation.html" target="_blank" rel="external">http://dev.mysql.com/doc/refman/5.6/en/binary-installation.html</a><br><a href="http://dev.mysql.com/doc/refman/5.6/en/default-privileges.html" target="_blank" rel="external">http://dev.mysql.com/doc/refman/5.6/en/default-privileges.html</a></p>
 <h3 id="安装MySQL的依赖">安装MySQL的依赖</h3>
@@ -355,7 +391,7 @@
 
 <h4 id="解决中文乱码">解决中文乱码</h4>
 <p>中文乱码的根源出在系统各处编码不统一，这里我们统一使用UTF8编码解决此问题，在MySQL配置中加入以下部分</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[client]</div><div class="line">default-character-set=utf8</div><div class="line"></div><div class="line">[mysql]</div><div class="line">default-character-set=utf8</div><div class="line"></div><div class="line">[mysqld]</div><div class="line">character-set-server=utf8</div><div class="line"><span class="keyword">...</span></div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[mysql]</div><div class="line">default-character-set=utf8</div><div class="line"></div><div class="line">[mysqld]</div><div class="line">character-set-server=utf8</div><div class="line"><span class="keyword">...</span></div></pre></td></tr></table></figure>
 
 <h2 id="安装Tomcat">安装Tomcat</h2>
 <h3 id="安装JRE">安装JRE</h3>

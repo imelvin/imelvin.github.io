@@ -4,15 +4,17 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>使用参数占位符查询防止SQL/HQL注入 | Elvin Blog</title>
+    <title>CentOS设置Tomcat为系统服务并随机启动 | Elvin Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="Elvin Guan">
     
-    <meta name="description" content="在一些需要数据库查询的场景中，查询条件常常是通过用户输入来的。这里经常就会出现拼接SQL或者HQL的代码。比如：
-1String hql = &quot;from table where key = &#39;&quot; + key + &quot;&#39; order by id desc&quot;;
+    <meta name="description" content="将tomcat设置为系统服务
+将catalina.sh复制到/etc/init.d下
+12cd /usr/local/tomcatcp bin/catalina.sh /etc/init.d/tomcat
 
-这种方式可以完成查询的需求，但是也会代码安">
+在/etc/init.d/tomcat加入以下内容（根据实际情况配置）：
+12JAVA_HO">
     
     
     
@@ -73,14 +75,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/05/05/使用参数占位符查询防止SQL-HQL注入/" title="使用参数占位符查询防止SQL/HQL注入" itemprop="url">使用参数占位符查询防止SQL/HQL注入</a>
+      <a href="/2015/06/09/CentOS设置Tomcat为系统服务并随机启动/" title="CentOS设置Tomcat为系统服务并随机启动" itemprop="url">CentOS设置Tomcat为系统服务并随机启动</a>
   </h1>
   <p class="article-author">By
        
 		<a href="http://elvin.im/about" title="Elvin Guan" target="_blank" itemprop="author">Elvin Guan</a>
 		
   <p class="article-time">
-    <time datetime="2015-05-05T11:54:48.000Z" itemprop="datePublished"> 发表于 5月 5 2015</time>
+    <time datetime="2015-06-09T11:03:51.000Z" itemprop="datePublished"> 发表于 6月 9 2015</time>
     
   </p>
 </header>
@@ -90,27 +92,27 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#将tomcat设置为系统服务"><span class="toc-number">1.</span> <span class="toc-text">将tomcat设置为系统服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#让tomcat随机启动"><span class="toc-number">2.</span> <span class="toc-text">让tomcat随机启动</span></a></li></ol>
 		
 		</div>
 		
-		<p>在一些需要数据库查询的场景中，查询条件常常是通过用户输入来的。这里经常就会出现拼接SQL或者HQL的代码。比如：</p>
-<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">String</span> hql = <span class="string">"from table where key = '"</span> + <span class="keyword">key</span> + <span class="string">"' order by id desc"</span>;</div></pre></td></tr></table></figure>
+		<h2 id="将tomcat设置为系统服务">将tomcat设置为系统服务</h2>
+<p>将catalina.sh复制到/etc/init.d下</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cd</span> /usr/local/tomcat</div><div class="line"><span class="keyword">cp</span> bin/catalina.<span class="keyword">sh</span> /etc/init.<span class="keyword">d</span>/tomcat</div></pre></td></tr></table></figure>
 
-<p>这种方式可以完成查询的需求，但是也会代码安全风险，比如用户输入如下：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span><span class="string">' or '</span><span class="number">1</span><span class="string">'='</span><span class="number">1</span></div></pre></td></tr></table></figure>
+<p>在/etc/init.d/tomcat加入以下内容（根据实际情况配置）：</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="constant">JAVA_HOME</span>=<span class="string">"/usr/local/java/jdk1.7.0_80"</span></div><div class="line"><span class="constant">CATALINA_HOME</span>=<span class="string">"/usr/local/tomcat"</span></div></pre></td></tr></table></figure>
 
-<p>该参数输入后，经过拼接后就变成了</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> table <span class="keyword">where</span> key = <span class="string">'1'</span> <span class="keyword">or</span> <span class="string">'1'</span>=<span class="string">'1'</span> <span class="keyword">order</span> <span class="keyword">by</span> id <span class="keyword">desc</span></div></pre></td></tr></table></figure>
+<p>到这一步了就tomcat就可以用以下命令来启动和关闭了</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">service tomcat <span class="operator"><span class="keyword">start</span></span></div><div class="line">service tomcat <span class="keyword">stop</span></div></pre></td></tr></table></figure>
 
-<p>这样就会将该表中的所有记录都查询出来。同样的问题在使用SQL的时候同样会有。</p>
-<p>解决这类问题其实很简单，只需要在写数据库查询代码时不要使用SQL和HQL拼接，在需要传递参数时，用参数占位符即可。比如：</p>
-<figure class="highlight [java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">String</span> hql = <span class="string">"from table where key = ? order by id desc"</span>;</div><div class="line"><span class="keyword">this</span>.hibernateTemplate.find(hql, key);</div></pre></td></tr></table></figure>
+<h2 id="让tomcat随机启动">让tomcat随机启动</h2>
+<p>首先让/etc/init.d/tomcat支持chkconfig，加入以下内容</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor"># chkconfig: 2345 73 73</span></div><div class="line"><span class="preprocessor"># description: start or stop tomcat</span></div></pre></td></tr></table></figure>
 
-<p>再比如：</p>
-<figure class="highlight [java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="variable">String</span> hql = <span class="string">"from table where key = :key order by id desc"</span>;</div><div class="line"><span class="variable">Query</span> <span class="keyword">query</span> = session.create<span class="variable">Query</span>(hql);</div><div class="line"><span class="keyword">query</span>.set<span class="variable">String</span>(<span class="string">"key"</span>, key);</div></pre></td></tr></table></figure>
+<p>然后运行以下命令即可</p>
+<figure class="highlight [shell]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chkconfig --<span class="built_in">add</span> tomcat</div></pre></td></tr></table></figure>
 
-<p>用参数占位符的方式可以使SQL在数据库预编译，将参数单独传递给数据库，就算参数中有特殊符号，也不会被数据库当做语句执行，这种方式可以有效的避免SQL注入漏洞。<br>SQL拼接产生注入漏洞的原因就是拼接出来的SQL在执行的时候才会进行编译。数据库收到的只是一个Plain SQL，无法区分是否被注入。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -118,13 +120,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/数据库/">数据库</a>
+  <a class="article-category-link" href="/categories/Linux/">Linux</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Hibernate-注入/">Hibernate 注入</a>
+  <span></span> <a href="/tags/Linux-Tomcat/">Linux Tomcat</a>
   </div>
 
 </div>
@@ -132,7 +134,7 @@
 
 <div class="article-share" id="share">
 
-  <div data-url="http://elvin.im/2015/05/05/使用参数占位符查询防止SQL-HQL注入/" data-title="使用参数占位符查询防止SQL/HQL注入 | Elvin Blog" data-tsina="null" class="share clearfix">
+  <div data-url="http://elvin.im/2015/06/09/CentOS设置Tomcat为系统服务并随机启动/" data-title="CentOS设置Tomcat为系统服务并随机启动 | Elvin Blog" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -141,19 +143,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/05/13/CentOS-7下MySQL与Tomcat环境搭建过程备份/" title="CentOS 7下MySQL与Tomcat环境搭建过程备份">
-  <strong>上一篇：</strong><br/>
-  <span>
-  CentOS 7下MySQL与Tomcat环境搭建过程备份</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/02/05/Android学习之RSS阅读器开发之三——功能更新/"  title="Android学习之RSS阅读器开发之三——功能更新">
+<a href="/2015/06/05/MySQL索引简单研究/"  title="MySQL索引简单研究">
  <strong>下一篇：</strong><br/> 
- <span>Android学习之RSS阅读器开发之三——功能更新
+ <span>MySQL索引简单研究
 </span>
 </a>
 </div>
@@ -172,7 +166,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#将tomcat设置为系统服务"><span class="toc-number">1.</span> <span class="toc-text">将tomcat设置为系统服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#让tomcat随机启动"><span class="toc-number">2.</span> <span class="toc-text">让tomcat随机启动</span></a></li></ol>
  
   </div>
 
