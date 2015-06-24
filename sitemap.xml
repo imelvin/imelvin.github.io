@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://elvin.im/2015/06/24/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BAHadoop%E9%9B%86%E7%BE%A4/</loc>
+    <lastmod>2015-06-24T12:10:22.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://elvin.im/2015/06/09/CentOS%E8%AE%BE%E7%BD%AETomcat%E4%B8%BA%E7%B3%BB%E7%BB%9F%E6%9C%8D%E5%8A%A1%E5%B9%B6%E9%9A%8F%E6%9C%BA%E5%90%AF%E5%8A%A8/</loc>
     <lastmod>2015-06-09T11:04:32.000Z</lastmod>
   </url>
