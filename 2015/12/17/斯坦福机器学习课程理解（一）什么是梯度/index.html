@@ -1,0 +1,479 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>斯坦福机器学习课程理解（一）什么是梯度 | Elvin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Elvin Guan">
+    
+    <meta name="description" content="背景
+入行程序员以来，渐渐觉得现在使用的一些技术都是一些很基础的东西，并没有什么深度。然后又看到了机器学习的一些应用，深感以我现有的经验根本无法完成，所以萌发了自学机器学习的想法。在网易公开课上找到Andrew Ng的机器学习课程，评价非常好，就这样，我开始了这门课的学习。
+第一节课是类似于课程导论">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="Elvin Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Elvin Blog" title="Elvin Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Elvin Blog">Elvin Blog</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:elvin.im">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/12/17/斯坦福机器学习课程理解（一）什么是梯度/" title="斯坦福机器学习课程理解（一）什么是梯度" itemprop="url">斯坦福机器学习课程理解（一）什么是梯度</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://elvin.im/about" title="Elvin Guan" target="_blank" itemprop="author">Elvin Guan</a>
+		
+  <p class="article-time">
+    <time datetime="2015-12-17T11:18:25.000Z" itemprop="datePublished"> 发表于 12月 17 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#梯度"><span class="toc-number">2.</span> <span class="toc-text">梯度</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#梯度的解释"><span class="toc-number">2.1.</span> <span class="toc-text">梯度的解释</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#形式化定义"><span class="toc-number">2.2.</span> <span class="toc-text">形式化定义</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+		
+		</div>
+		
+		<h1 id="背景">背景</h1>
+<p>入行程序员以来，渐渐觉得现在使用的一些技术都是一些很基础的东西，并没有什么深度。然后又看到了机器学习的一些应用，深感以我现有的经验根本无法完成，所以萌发了自学机器学习的想法。在网易公开课上找到Andrew Ng的机器学习课程，评价非常好，就这样，我开始了这门课的学习。</p>
+<p>第一节课是类似于课程导论，在大学学习模式识别时也有所了解。第二节课就正式开始讲解相关知识，第一个算法介绍的是梯度下降，发现不像本科课程，算法会涉及到大量数学知识。于是我就先补一下相关的数学知识。</p>
+<h1 id="梯度">梯度</h1>
+<h2 id="梯度的解释">梯度的解释</h2>
+<p>维基百科上对梯度的解释如下</p>
+<blockquote>
+<p>假设有一个房间，房间内所有点的温度由一个标量场$\phi$ 给出的，即点$(x,y,z)$的温度是$\phi (x,y,z)$。假设温度不随时间改变。然后，在房间的每一点，该点的梯度将显示变热最快的方向。梯度的大小将表示在该方向上变热的速度。</p>
+</blockquote>
+<p>看到这个解释，就好理解了。将情况简化，维度减少到一维，梯度就是导数，假如是一个线性函数，梯度就是斜率。</p>
+<h2 id="形式化定义">形式化定义</h2>
+<p>一个标量函数$\varphi $的梯度记为：</p>
+<p>$$\nabla \varphi 或\operatorname {grad} \varphi $$<br>其中$\nabla$（nabla）表示向量微分算子。</p>
+<p>$\nabla \varphi $在三维直角坐标中表示为</p>
+<p>$$\nabla \varphi ={\begin{pmatrix}{\frac {\partial \varphi }{\partial x}},{\frac {\partial \varphi }{\partial y}},{\frac {\partial \varphi }{\partial z}}\end{pmatrix}}$$</p>
+<p>比如：<br>函数$\varphi =2x+3y^{2}-\sin(z)$的梯度为：</p>
+<p>$$\nabla \varphi ={\begin{pmatrix}{\frac {\partial \varphi }{\partial x}},{\frac {\partial \varphi }{\partial y}},{\frac {\partial \varphi }{\partial z}}\end{pmatrix}}={\begin{pmatrix}{2},{6y},{-\cos(z)}\end{pmatrix}}$$</p>
+<h1 id="总结">总结</h1>
+<p>梯度实际就是单变量函数求导数的多变量版本。这样梯度下降中的求解偏微分就好理解了，就是为了找到下降速度最快的方向。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/机器学习/">机器学习</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/机器学习/">机器学习</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://elvin.im/2015/12/17/斯坦福机器学习课程理解（一）什么是梯度/" data-title="斯坦福机器学习课程理解（一）什么是梯度 | Elvin Blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/02/04/【译】Java垃圾回收/" title="【译】Java垃圾回收">
+  <strong>上一篇：</strong><br/>
+  <span>
+  【译】Java垃圾回收</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/06/24/使用Docker搭建Hadoop集群/"  title="使用Docker搭建Hadoop集群">
+ <strong>下一篇：</strong><br/> 
+ <span>使用Docker搭建Hadoop集群
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#梯度"><span class="toc-number">2.</span> <span class="toc-text">梯度</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#梯度的解释"><span class="toc-number">2.1.</span> <span class="toc-text">梯度的解释</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#形式化定义"><span class="toc-number">2.2.</span> <span class="toc-text">形式化定义</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Java/" title="Java">Java<sup>4</sup></a></li>
+		
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Maven/" title="Maven">Maven<sup>1</sup></a></li>
+		
+			<li><a href="/categories/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Windows/" title="Windows">Windows<sup>1</sup></a></li>
+		
+			<li><a href="/categories/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		
+			<li><a href="/categories/机器学习/" title="机器学习">机器学习<sup>1</sup></a></li>
+		
+			<li><a href="/categories/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/categories/算法实现/" title="算法实现">算法实现<sup>5</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Java-POI/" title="Java POI">Java POI<sup>2</sup></a></li>
+		
+			<li><a href="/tags/机器学习/" title="机器学习">机器学习<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hadoop-Docker/" title="Hadoop Docker">Hadoop Docker<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Linux-Tomcat/" title="Linux Tomcat">Linux Tomcat<sup>1</sup></a></li>
+		
+			<li><a href="/tags/MySQL-数据库-索引/" title="MySQL 数据库 索引">MySQL 数据库 索引<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Maven-Nexus/" title="Maven Nexus">Maven Nexus<sup>1</sup></a></li>
+		
+			<li><a href="/tags/CentOS-Linux/" title="CentOS Linux">CentOS Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/CentOS-Linux-MySQL-Tomcat/" title="CentOS Linux MySQL Tomcat">CentOS Linux MySQL Tomcat<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hibernate-注入/" title="Hibernate 注入">Hibernate 注入<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>1</sup></a></li>
+		
+			<li><a href="/tags/HTML/" title="HTML">HTML<sup>1</sup></a></li>
+		
+			<li><a href="/tags/寻找第k小元素/" title="寻找第k小元素">寻找第k小元素<sup>1</sup></a></li>
+		
+			<li><a href="/tags/最长公共子序列/" title="最长公共子序列">最长公共子序列<sup>1</sup></a></li>
+		
+			<li><a href="/tags/寻找多数元素/" title="寻找多数元素">寻找多数元素<sup>1</sup></a></li>
+		
+			<li><a href="/tags/并查集/" title="并查集">并查集<sup>1</sup></a></li>
+		
+			<li><a href="/tags/快速排序/" title="快速排序">快速排序<sup>1</sup></a></li>
+		
+			<li><a href="/tags/无线网络共享-Windows/" title="无线网络共享 Windows">无线网络共享 Windows<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hexo-github/" title="Hexo github">Hexo github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JavaScript-闭包-ExtJS/" title="JavaScript 闭包 ExtJS">JavaScript 闭包 ExtJS<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><a href="http://leorz.com" target="_blank" title="Leo">Leo's Blog</a></li>
+      <li><a href="http://hexo.io" target="_blank" title="Hexo">Hexo</a></li>
+    </ul>
+</div>
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2016 
+		
+		<a href="http://elvin.im/about" target="_blank" title="Elvin Guan">Elvin Guan</a>
+		
+		</p>
+</div>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F9cc4c1668f1879156c0627818f4e84ae' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"elvin-blog"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>

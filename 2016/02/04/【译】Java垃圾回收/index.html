@@ -1,0 +1,677 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>【译】Java垃圾回收 | Elvin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Elvin Guan">
+    
+    <meta name="description" content="原文地址：Garbage Collection in Java
+Java内存管理-自带的垃圾回收机制，是Java语言最好的实现之一。因为垃圾回收器会自动回收内存以供再次使用，所以程序员不需要关注对象内存的分配与释放。这一点可以帮助程序员更快的开发代码而不需要额外的处理内存泄露和其他内存相关的问题。这">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="Elvin Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Elvin Blog" title="Elvin Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Elvin Blog">Elvin Blog</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:elvin.im">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/04/【译】Java垃圾回收/" title="【译】Java垃圾回收" itemprop="url">【译】Java垃圾回收</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://elvin.im/about" title="Elvin Guan" target="_blank" itemprop="author">Elvin Guan</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-04T06:32:28.000Z" itemprop="datePublished"> 发表于 2月 4 2016</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#垃圾回收"><span class="toc-number">1.</span> <span class="toc-text">垃圾回收</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自动垃圾回收"><span class="toc-number">2.</span> <span class="toc-text">自动垃圾回收</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么需要分代垃圾回收？"><span class="toc-number">3.</span> <span class="toc-text">为什么需要分代垃圾回收？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分代垃圾回收过程"><span class="toc-number">4.</span> <span class="toc-text">分代垃圾回收过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#垃圾回收真正如何工作"><span class="toc-number">5.</span> <span class="toc-text">垃圾回收真正如何工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GC_Roots"><span class="toc-number">6.</span> <span class="toc-text">GC Roots</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#垃圾释放机制"><span class="toc-number">7.</span> <span class="toc-text">垃圾释放机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#引用计数"><span class="toc-number">8.</span> <span class="toc-text">引用计数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#标记-清除回收"><span class="toc-number">9.</span> <span class="toc-text">标记-清除回收</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#整理"><span class="toc-number">10.</span> <span class="toc-text">整理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#复制回收器"><span class="toc-number">11.</span> <span class="toc-text">复制回收器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分代回收技术"><span class="toc-number">12.</span> <span class="toc-text">分代回收技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关于垃圾回收的一些问题"><span class="toc-number">13.</span> <span class="toc-text">关于垃圾回收的一些问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使对象可回收的方法"><span class="toc-number">14.</span> <span class="toc-text">使对象可回收的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何设置永久区空间大小？"><span class="toc-number">15.</span> <span class="toc-text">如何设置永久区空间大小？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#垃圾回收性能调优关键点"><span class="toc-number">16.</span> <span class="toc-text">垃圾回收性能调优关键点</span></a></li></ol>
+		
+		</div>
+		
+		<p>原文地址：<a href="http://java-latte.blogspot.in/2013/08/garbage-collection-in-java.html" target="_blank" rel="external">Garbage Collection in Java</a></p>
+<p>Java内存管理-自带的垃圾回收机制，是Java语言最好的实现之一。因为垃圾回收器会自动回收内存以供再次使用，所以程序员不需要关注对象内存的分配与释放。这一点可以帮助程序员更快的开发代码而不需要额外的处理内存泄露和其他内存相关的问题。这就是本文要探讨的问题。</p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/Garbage_Collection.jpg" alt=""></p>
+<h2 id="垃圾回收">垃圾回收</h2>
+<p>当一个Java对象对程序不可达时，该对象就会被回收。<br>垃圾回收器主要用途是标记和释放程序不再需要的对象以供资源释放后被重用。<br>垃圾回收的优点有以下几点：</p>
+<ul>
+<li>提高编码效率，因为无需关注内存问题</li>
+<li>程序完整性</li>
+<li>垃圾回收也是Java语言一项重要的安全策略。Java程序员无法通过错误释放内存而造成虚拟机崩溃</li>
+</ul>
+<h2 id="自动垃圾回收">自动垃圾回收</h2>
+<p>自动垃圾回收是扫描堆内存，标记出哪些对象正在被使用、哪些已经不再使用，并释放无用对象的过程。<br>一个正在使用中的对象，或者被引用的对象，意味着你的程序中某一部分仍然维护着一个指向该对象的指针。一个无用的对象，或者不再被引用的对象，意味着程序中任一部分都没有再引用该对象。所以失去引用的对象所占用的内存就可以被回收了。</p>
+<p>像C这样的语言中，分配和释放内存都需要程序员手工完成。而在Java中，内存回收由垃圾回收器自动处理。</p>
+<p>垃圾回收的基本过程如下：</p>
+<ul>
+<li>标记过程</li>
+<li>正常删除对象</li>
+<li>删除对象并整理内存</li>
+</ul>
+<p><strong>标记过程</strong>：标记过程是识别哪片内存是有用或无用的<br>该过程会扫描内存中所有的对象。扫描一个系统中所有的对象将会非常耗时。</p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/marking.PNG" alt=""></p>
+<p><strong>正常删除对象</strong>：在此过程中，会删除所有无用对象来释放内存空间。</p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/normal.PNG" alt=""></p>
+<p><strong>删除对象并整理内存</strong>：为了后续运行的性能，除了删除无用对象以外，还会整理内存中剩余的对象。通过该操作，后续的内存分配会容易和快得多。</p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/dele_compact.PNG" alt=""></p>
+<p>也许你已经了解过青年代、老年代和永久代这样的垃圾回收概念。我们将在下一章详细讨论。</p>
+<p>第一个需要关注的问题就是</p>
+<h2 id="为什么需要分代垃圾回收？">为什么需要分代垃圾回收？</h2>
+<p>你已经看到正常情况下垃圾回收需要标记整理JVM中所有对象，这是非常低效的。由于越来越多的对象创建出来，对象越来越多导致垃圾回收的耗时会越来越长，因为大多数对象的存活时间都很短。</p>
+<p><strong>JVM分代</strong></p>
+<ul>
+<li>青年代</li>
+<li>老年代</li>
+<li>永久代，在Java 8中已经被Metaspace替代</li>
+</ul>
+<p>堆内存被分割成几个小区域：青年带、老年代和永久代。</p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/heap_generation.PNG" alt=""></p>
+<p>Java使用分代垃圾回收。当有一个对象foo（某个类的实例），存活的垃圾回收周期越多（如果仍然存在引用），它就会被升代。一个对象在青年代创建（青年代又被分为Eden区和Survivor区），当对象在青年代存活足够长时间以后，最终会被移到老年代。</p>
+<ul>
+<li>青年代，所有新对象被创建和存活的区域</li>
+<li>Eden区（堆空间），多数对象初始化创建的内存区域</li>
+<li>Survivor区（堆空间），存储经过Eden区回收以后存活下来的对象</li>
+<li>老年代（堆空间），存储在Survivor区存活一段时间的对象</li>
+<li>永久代（非堆空间），存储所有虚拟机自身的反射数据，比如类和方法的定义。为了Java虚拟机之间的数据共享，该区域被分为只读区域和可读写区域。</li>
+</ul>
+<p><strong>注意</strong>：永久代<em>不是堆的一部分</em>，它是存放类定义和相关数据的一块独立区域，比如intern字符串。</p>
+<p>当青年代满了以后，将会触发<strong>Minor GC</strong>。如果对象死亡率很高，那么Minor GC可以被优化。一个充满死亡对象的青年代被回收的非常快。一些对象在青年代一直存活，最终会被移动到老年代。</p>
+<p><strong>停止世界事件</strong> - 所有的Minor GC都是“停止世界事件”。这意味着在内存回收完成之前所有的应用线程都会暂停。老年代用来存储长生命周期的对象。通常，我们会设置一个阈值，当青年代对象存活时间超过这个阈值，就会被移动到老年代。最终老年代也需要回收，这就是Major GC。</p>
+<p>Major GC也是“停止世界事件”。通常Major GC要慢很多，因为会扫描所有的对象。对于响应时间要求高的应用程序，Major GC次数应该被最小化。同时需要注意的是，老年代的回收时间长短也与老年代所使用的垃圾回收器有关。</p>
+<p><strong>永久代</strong>用来存储应用程序中类和方法定义的元数据信息。此外，Java SE的library的类和方法也会被存储在这里。</p>
+<p>当JVM不在需要某些类时，它们会被回收，释放出来的空间会被其他类使用。永久代的回收会在Full GC中进行。</p>
+<h2 id="分代垃圾回收过程">分代垃圾回收过程</h2>
+<p>现在，假设你对为什么要分代回收已经有了一定的了解。我们将在图片的帮助下看看JVM中这些空间的内存分配和对象衰老过程。</p>
+<p><strong>1. 首先，任何新对象都被分配在Eden区，两个Survivor区开始都是空的。</strong></p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/1_object_allocation.PNG" alt=""></p>
+<p><strong>2. 当所有的Eden空间被占满后，Minor GC就会被触发</strong></p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/1_eden_space.PNG" alt=""></p>
+<p><strong>3. Minor GC后，还有引用的对象会被移动到第一个Survivor区。无用对象会在Eden区被清除时回收</strong></p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/3_cpy_referen_onject.PNG" alt=""></p>
+<p><strong>4. 在下一次Minor GC时，Eden区会进行同样的操作。无用对象会被删除，有用对象会被移动带Survivor区。不过，在此时有用对象会被移动到另一个Survivor区（S1）。此外，上一次Minor GC存活下来的Survivor区（S0）中的对象年龄会增加并且移动到S1。一旦所有存活对象被移动到S1，S0和Eden区都会被清空。注意，现在S1中有了两批不同年龄的对象</strong></p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/4_aging_object.PNG" alt=""></p>
+<p><strong>5. 在下一次Minor GC中，同样的过程会重复。只是这次Survivor区会交换。有引用的对象会移动到S0，存活的对象年龄增长，Eden区和S1被清空</strong></p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/5_add-aging.PNG" alt=""></p>
+<p><strong>6. 在一次Minor GC后，当衰老的对象达到一个年龄阈值（此例中为8），它们会升代到老年代</strong></p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/6-promot.PNG" alt=""></p>
+<p><strong>7. 然后Minor GC会持续发生，对象会不断被升代到老年代空间</strong></p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/7.PNG" alt=""></p>
+<p><strong>8. 这几乎涵盖了青年代的整个过程。最终，Major GC将会在老年代执行来清楚和整理内存空间</strong></p>
+<p><img src="http://7q5c1f.com1.z0.glb.clouddn.com/8_.PNG" alt=""></p>
+<h2 id="垃圾回收真正如何工作">垃圾回收真正如何工作</h2>
+<p>许多人认为垃圾回收是收集和移除死亡的对象。而实际上，Java垃圾回收是做的相反的事情。存活的对象被跟踪而其他所有对象都是垃圾。正如你看到的，这个基本原理的误解会导致很多性能问题。</p>
+<p>让我们从动态内存空间所在的堆内存开始。在大多数操作系统的配置中，JVM会在程序运行时提前分配堆内存。这有以下两个好处：</p>
+<ul>
+<li>由于操作系统不需要在为每个对象单独分配内存，所以<strong>对象创建速度更快</strong>。一次内存分配简化成了一个内存数组的指针移动</li>
+<li>当一个对象不再使用，垃圾回收器会回收该对象的内存并将该块内存用于未来的对象内存分配。这样就<strong>不需要显式删除且内存不需要回收给操作系统</strong></li>
+</ul>
+<p>所有的对象都在JVM管理的堆内存中分配。程序员用到的每个元素都会这样处理，包括类实例，静态变量，甚至代码本身。只要一个对象还被引用着，JVM就认为它还存活。一旦失去引用导致在应用代码中不可达时，垃圾回收器会清除并回收无用的内存。这听上去很简单，但是有一个问题：一个应用程序的第一个引用是什么？</p>
+<h2 id="GC_Roots">GC Roots</h2>
+<p>每个对象必须有一个或多个根对象。只要应用程序可以访问到这些根对象，那么这个树上所有的对象都是可以访问的。但是什么时候这些根对象被认为可访问呢？一些被称为GC Roots的特定对象总是可以访问的，任何根对象中有GC Roots的对象也同样是可以访问的。</p>
+<p><strong>Java中有4种GC Roots</strong>：</p>
+<ol>
+<li><strong>局部变量</strong>，存活在线程的栈中。这不是一个实际对象的虚拟引用，因此并不可见。</li>
+<li><strong>活动的Java线程</strong>总是被认为是存活对象，因此是GC Root。这对线程的局部变量尤其重要。</li>
+<li><strong>静态变量</strong>被他们的类引用。这一点使他们事实上也是GC Root。类本身是可以被回收的，此时会清除所有的静态成员。</li>
+<li><strong>JNI引用</strong>是Java对象被native代码引用，这是JNI调用的一部分。因为JVM并不知道某个对象是否被native代码引用，所以这些对象会被特殊对待。这样的对象代表了一个特殊形式的GC Root。</li>
+</ol>
+<p>因此，一个简单的Java应用有如下GC Roots：</p>
+<ul>
+<li>主线程中的局部变量</li>
+<li>主线程本身</li>
+<li>Main类的静态成员</li>
+</ul>
+<h2 id="垃圾释放机制">垃圾释放机制</h2>
+<p><strong>用户控制的内存释放</strong><br>内存释放可以被手动和自动控制。在C/C++中，程序员需要主动调用free()、delete()方法来释放内存。然后对象会被添加到空闲空间以供重新分配。</p>
+<p><strong>自动垃圾回收</strong><br>另一个堆内存回收机制就是垃圾回收。目前有很多垃圾回收技术。</p>
+<h2 id="引用计数">引用计数</h2>
+<p>这是最古老和最简单的垃圾回收技术之一。<br>每个堆中的对象都有一个引用计数字段，它记录着堆对象的引用次数。当一个对象的引用计数变为0，它就会被回收。</p>
+<h2 id="标记-清除回收">标记-清除回收</h2>
+<p>包括标记&amp;清除法在内的很多回收器，在空间几乎满之前不做任何事情。<br>回收器运行一个标记过程标记所有存活的堆对象。<br>在标记过程以后，任何没有被标记的对象都是要被释放的垃圾。然后清空堆空间，回收所有未被标记的对象。在标记过程中也会清除所有仍在使用中的堆对象。</p>
+<p>这基本可分为两个过程：</p>
+<ol>
+<li>算法从GC Roots开始扫描所有对象的引用，并标记所有存活的对象</li>
+<li>对内存中所有没有被标记的对象会被回收。它们只是简单的被标记为释放</li>
+</ol>
+<h2 id="整理">整理</h2>
+<p>当清除过程以后，存活的对象会分布在整个堆空间。如果活动对象跨越许多内存页，分页的开销可能会增加。Cache命中率可能也会下降。<br>我们可以在标记-清除后添加一个整理阶段。在存活的对象被标记出来以后，他们会一起被移动到堆的一端。该过程还包括了将全局指针、局部指针和内部堆指针指向对象新地址。</p>
+<h2 id="复制回收器">复制回收器</h2>
+<p>复制回收器被用来整合复制与存货堆对象的识别。复制收集器非常流行而且被使用的非常广泛。<br>假设一个简单的复制回收器，我们开始将堆分为两半 - from区和to区。</p>
+<p>一开始，我们从from区用一个简单的“堆的一端”的指针来分配堆内存。当from区满了以后，我们停下来做垃圾回收。实际上，我们不真的做垃圾回收，我们将标记阶段存活的对象移动到to区，然后将指针更新到对象的新地址。</p>
+<h2 id="分代回收技术">分代回收技术</h2>
+<p>复制回收器的伟大之处在于很多在两次垃圾回收之间的创建和死亡的对象并不会消耗资源。然而<strong>并不是所有的堆对象都如此短命</strong>。实际上，一些堆对象非常长寿。<br>分代垃圾回收技术是为了更好的处理不同生存时间的对象。堆被分为两代或更多代，每一代都有自己的from区和to区。回收最频繁的新对象被分配在最年轻的一代。如果对象存活过一次或多次垃圾回收，它就会被升代到更老的一代，这样它就会尽量少的被垃圾回收处理。这样持续直到那些非常长寿的对象会到达最老的一代，这里的对象很少会被回收。</p>
+<p>该方法的优点在于那些长寿的对象会被“筛选”出来，极大的降低了重复处理它们的开销。当然，一些长寿的对象在本代最终被回收时也会死亡。</p>
+<h2 id="关于垃圾回收的一些问题">关于垃圾回收的一些问题</h2>
+<ol>
+<li><p>垃圾回收涉及到了哪些内存？<br>堆内存</p>
+</li>
+<li><p>垃圾回收有哪些职责？<br>垃圾回收负责释放那些不可访问对象的内存空间。它确保内存可以被高效使用，但是不保证有足够的内存运行程序。</p>
+</li>
+<li><p>一个对象什么时候会被回收呢？<br>当没有活动线程可以访问到一个对象时，它会变成可回收的</p>
+</li>
+<li><p>垃圾回收可以强制执行吗？<br>垃圾回收不能被强制执行。尽管有几个请求GC的方法，但是JVM并不保证会马上执行GC。</p>
+</li>
+<li><p>如何请求GC？</p>
+<ol>
+<li>Java中运行GC的方法在Runtime中。Runtime是Java主程序的一个单例。getRuntime()方法返回一个Runtime单例，Runtime实例的gc()方法用来请求GC操作。</li>
+<li>调用System类的System.gc()方法来请求JVM的GC操作。</li>
+</ol>
+</li>
+<li><p>GC可以保证程序不会出现Out Of Memory吗？<br>GC不能保证程序不会OOM。</p>
+</li>
+<li><p>Java中finalize方法的用途是什么？<br>在对象被回收之前做一些清理操作，比如关闭数据库连接，释放资源等。</p>
+</li>
+<li><p>如果一个对象已经被回收了，那它还能重新被访问吗？<br>不能</p>
+</li>
+<li><p>String如何被回收？<br>在正常情况下，字符串常量和类都被分配在JVM的永久代中，通常不会被回收。</p>
+</li>
+</ol>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">String</span> s = <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">"java-latte"</span>);</div></pre></td></tr></table></figure>
+
+
+<p>   s引用的字符串对象被分配在堆内存中，而字符串常量”java-latte”被分配在字符串池。字符串池中的对象不会被回收。在程序的整个生命周期，字符串池中的对象会被重用，来提高性能。<br>   如果你像这样调用intern()方法：</p>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">String</span> s = <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">"java-latte"</span>).Intern();</div></pre></td></tr></table></figure>
+
+
+<p>   intern方法会返回字符串常量”java-latte”。但是与字符串常量不同的intern字符串在他们不可访问时是会被回收的。</p>
+<ol>
+<li><p>静态字段是否会被回收？<br>一旦类被加载，静态字段就不会被回收。静态字段在该类相应的class loader被回收时会被回收。<br>基本上，静态变量被class对象引用，而class对象又被class loader引用。所以除非class loader移除了该类或者class loader被回收，其他情况静态变量是不会被回收的。</p>
+</li>
+<li><p>一个对象的finalize()方法会被垃圾回收器调用多少次？<br>一次。</p>
+</li>
+<li><p>如果在finalize()方法执行过程中抛出一个uncaught exception会发生什么？<br>该异常会被忽略而且垃圾回收的finalization过程会中断。</p>
+</li>
+<li><p>如何启用/禁用在程序退出时执行finalize()方法？<br>Runtime.getRuntime().runFinalizersOnExit(boolean value)，通过boolean参数来控制。</p>
+</li>
+<li><p>垃圾回收器是一个守护线程吗？<br>是一个守护线程。这个线程被JVM启动，在所有非守护线程退出以后退出。</p>
+</li>
+<li><p>谁在控制垃圾回收器？<br>JVM控制GC；JVM决定何时运行GC。当JVM发现内存不足时就会运行GC，但是JVM的GC操作不能保证实时执行。程序员可以请求GC但是JVM并不保证真正执行GC操作。</p>
+</li>
+<li><p>垃圾回收器如何处理类的实例成员和静态成员？<br>当实例成员没有存活的线程能够访问时就会被回收。静态成员被Class对象引用，Class对象被class loader引用，所以除非class loader卸载该类或者class loader被卸载，不然静态成员不会被卸载（想想卸载应用程序的行为）。</p>
+</li>
+<li><p>“单例”对象如何回收？<br>你必须有一个方法将静态变量设为null。下次再获取该单例时，实例会被重新创建…当然这也就不是一个单例了。</p>
+</li>
+<li><p>静态成员保存在JVM内存的哪个区域？<br>静态成员被保存在永久代。</p>
+</li>
+</ol>
+<h2 id="使对象可回收的方法">使对象可回收的方法</h2>
+<ol>
+<li>对象一旦不需要再使用就将引用设为null。</li>
+<li>将引用指向其他对象：</li>
+</ol>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="typename">String</span> str1 = <span class="string">"Java.latte.blogspot.in"</span>;</div><div class="line"><span class="typename">String</span> str2 = <span class="string">"google.com"</span>;</div><div class="line">//<span class="typename">String</span> object referred by str1 <span class="keyword">is</span> <span class="keyword">not</span> eligible <span class="keyword">for</span> GC yet</div><div class="line">str1 = str2;</div><div class="line">//str1 <span class="keyword">variable</span> referes <span class="keyword">to</span> the <span class="typename">String</span> object <span class="string">"google.com"</span> <span class="keyword">and</span> the object <span class="string">"Java.latte.blogspot.in"</span> <span class="keyword">is</span> <span class="keyword">not</span> referred by any <span class="keyword">variable</span> <span class="keyword">and</span> hence <span class="keyword">is</span> eligible <span class="keyword">for</span> GC</div></pre></td></tr></table></figure>
+
+
+<ol>
+<li>创建孤立区域<br>如果我们有两个对象，它们是同一个类的实例，而且两个对象互相引用。如果这两个对象没有任何其他的引用，这两个对象就形成了一个孤立区域，将会被GC回收。</li>
+</ol>
+<figure class="highlight [Java]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Test gc3;</div><div class="line">Test <span class="variable">gc1 =</span> new Test ();</div><div class="line">Test <span class="variable">gc2 =</span> new Test ();</div><div class="line">gc1.<span class="variable">g =</span> gc2;</div><div class="line">gc2.<span class="variable">g =</span> gc1;</div><div class="line"><span class="variable">gc1 =</span> <span class="constant">null</span>;</div><div class="line"><span class="variable">gc2 =</span> <span class="constant">null</span>;</div></pre></td></tr></table></figure>
+
+<p>   这里gc1和gc2互相引用而且没有其他有效的引用，形成了一个孤立区域。</p>
+<h2 id="如何设置永久区空间大小？">如何设置永久区空间大小？</h2>
+<p>你可以通过-XX:PermSize和-XX:MaxPermSize两个JVM选项来设置永久区大小。但是一般只有在OOM Perm size时我们才去设置它。</p>
+<h2 id="垃圾回收性能调优关键点">垃圾回收性能调优关键点</h2>
+<p><strong>堆空间大小</strong></p>
+<ul>
+<li>-Xms 启动JVM时分配的堆空间大小</li>
+<li>-Xmx 最大的JVM堆空间大小</li>
+</ul>
+<p><strong>青年区域大小</strong></p>
+<ul>
+<li>-XX:NewRatio 青年区域和老年区域的比例</li>
+<li>-XX:NewSize 青年区域大小</li>
+<li>-XX:SurvivorRatio Eden区和Survivor区的比例</li>
+</ul>
+<p>现在我们会在一些例子的帮助下理解这些参数</p>
+<p><strong>配置堆空间</strong></p>
+<ul>
+<li>-Xmx的值决定了JVM初始化时最大保留的堆空间大小</li>
+<li>-Xms的值在初始化时分配的空间大小，JVM内存可以增长到-Xmx的大小</li>
+</ul>
+<p><strong>总的堆大小</strong></p>
+<ul>
+<li>总的可用内存是影响GC性能最重要的参数</li>
+<li>默认情况下，JVM在每次GC增加和减少堆内存，以保住空闲空间与已用空间的比例在一定的范围内</li>
+<li>-XX:MinHeapFreeRatio - 当某一代中空闲空间比例低于这个值时就会扩充这一代的空间大小来保住这个比例。默认是40</li>
+<li>-XX:MaxHeapFreeRatio - 当某一代中空闲空间比例高于这个值时就会减少这一代的空间大小来保住这个比例。默认是70</li>
+</ul>
+<p><strong>青年代</strong></p>
+<p>青年代空间越大，Minor GC的次数越少，但是这意味着老年代更小，这会导致更频繁的Major GC。</p>
+<p><strong>-XX:SurvivorRatio</strong></p>
+<p>该参数表示每个Survivor区与Eden区的比例。SurvivorRatio参数控制着两个Survivor区的大小。<br>正如你上面看到的，青年代被分为3个区域。例如，-XX:SurvivorRatio=6将每个Survivor区与Eden区的比例设置为1:6，每个Survivor区空间将是青年代总大小的8分之1。<br>假设x=s0（Survivor 1），x=s1（Survivor 2），6x=eden区大小，青年代总大小为8x。显然每个Survivor区就是青年代总大小的8分之1.</p>
+<p><strong>-XX:NewSize</strong></p>
+<p>这是Survivor区（S0和S1）和Eden区的总大小</p>
+<p><strong>-XX:NewRatio</strong></p>
+<p>NewRatio是青年代大小与老年代的比例。<br>如果XX:NewRatio=1，青年代：老年代=1：1，对1GB的堆内存来说，青年代：老年代=500MB：500MB。<br>如果NewRatio是2，青年代：老年代=1：2，因此这个值越大，老年代大小会越大，青年代会越小。</p>
+<p><strong>-XX:+PrintTenuringDistribution</strong></p>
+<p>在每次新生代GC时，输出幸存区中对象的年龄分布</p>
+<p><strong>Example</strong><br>Xmx / Xms = 1000 MB<br>NewRatio = 3<br>从这两个参数我们可以计算出<br>老年代 = 750 &amp; 青年代（包括两个Survivor区和Eden区） = 250</p>
+<p>如果SurvivorRatio = 10，那么每个Survivor区大小是Eden区的1/12<br>那么计算结果如下：<br>20.888 = 21<br>S0 &amp; S1 = 21<br>Eden space= 208</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Java/">Java</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Java-垃圾回收/">Java 垃圾回收</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://elvin.im/2016/02/04/【译】Java垃圾回收/" data-title="【译】Java垃圾回收 | Elvin Blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/04/17/java-util-ConcurrentHashMap原理研究/" title="java.util.ConcurrentHashMap原理研究">
+  <strong>上一篇：</strong><br/>
+  <span>
+  java.util.ConcurrentHashMap原理研究</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/12/17/斯坦福机器学习课程理解（一）什么是梯度/"  title="斯坦福机器学习课程理解（一）什么是梯度">
+ <strong>下一篇：</strong><br/> 
+ <span>斯坦福机器学习课程理解（一）什么是梯度
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#垃圾回收"><span class="toc-number">1.</span> <span class="toc-text">垃圾回收</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自动垃圾回收"><span class="toc-number">2.</span> <span class="toc-text">自动垃圾回收</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么需要分代垃圾回收？"><span class="toc-number">3.</span> <span class="toc-text">为什么需要分代垃圾回收？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分代垃圾回收过程"><span class="toc-number">4.</span> <span class="toc-text">分代垃圾回收过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#垃圾回收真正如何工作"><span class="toc-number">5.</span> <span class="toc-text">垃圾回收真正如何工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GC_Roots"><span class="toc-number">6.</span> <span class="toc-text">GC Roots</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#垃圾释放机制"><span class="toc-number">7.</span> <span class="toc-text">垃圾释放机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#引用计数"><span class="toc-number">8.</span> <span class="toc-text">引用计数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#标记-清除回收"><span class="toc-number">9.</span> <span class="toc-text">标记-清除回收</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#整理"><span class="toc-number">10.</span> <span class="toc-text">整理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#复制回收器"><span class="toc-number">11.</span> <span class="toc-text">复制回收器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分代回收技术"><span class="toc-number">12.</span> <span class="toc-text">分代回收技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关于垃圾回收的一些问题"><span class="toc-number">13.</span> <span class="toc-text">关于垃圾回收的一些问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使对象可回收的方法"><span class="toc-number">14.</span> <span class="toc-text">使对象可回收的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何设置永久区空间大小？"><span class="toc-number">15.</span> <span class="toc-text">如何设置永久区空间大小？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#垃圾回收性能调优关键点"><span class="toc-number">16.</span> <span class="toc-text">垃圾回收性能调优关键点</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Java/" title="Java">Java<sup>4</sup></a></li>
+		
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Maven/" title="Maven">Maven<sup>1</sup></a></li>
+		
+			<li><a href="/categories/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Windows/" title="Windows">Windows<sup>1</sup></a></li>
+		
+			<li><a href="/categories/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		
+			<li><a href="/categories/机器学习/" title="机器学习">机器学习<sup>1</sup></a></li>
+		
+			<li><a href="/categories/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/categories/算法实现/" title="算法实现">算法实现<sup>5</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Java-POI/" title="Java POI">Java POI<sup>2</sup></a></li>
+		
+			<li><a href="/tags/机器学习/" title="机器学习">机器学习<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hadoop-Docker/" title="Hadoop Docker">Hadoop Docker<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Linux-Tomcat/" title="Linux Tomcat">Linux Tomcat<sup>1</sup></a></li>
+		
+			<li><a href="/tags/MySQL-数据库-索引/" title="MySQL 数据库 索引">MySQL 数据库 索引<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Maven-Nexus/" title="Maven Nexus">Maven Nexus<sup>1</sup></a></li>
+		
+			<li><a href="/tags/CentOS-Linux/" title="CentOS Linux">CentOS Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/CentOS-Linux-MySQL-Tomcat/" title="CentOS Linux MySQL Tomcat">CentOS Linux MySQL Tomcat<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hibernate-注入/" title="Hibernate 注入">Hibernate 注入<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>1</sup></a></li>
+		
+			<li><a href="/tags/HTML/" title="HTML">HTML<sup>1</sup></a></li>
+		
+			<li><a href="/tags/寻找第k小元素/" title="寻找第k小元素">寻找第k小元素<sup>1</sup></a></li>
+		
+			<li><a href="/tags/最长公共子序列/" title="最长公共子序列">最长公共子序列<sup>1</sup></a></li>
+		
+			<li><a href="/tags/寻找多数元素/" title="寻找多数元素">寻找多数元素<sup>1</sup></a></li>
+		
+			<li><a href="/tags/并查集/" title="并查集">并查集<sup>1</sup></a></li>
+		
+			<li><a href="/tags/快速排序/" title="快速排序">快速排序<sup>1</sup></a></li>
+		
+			<li><a href="/tags/无线网络共享-Windows/" title="无线网络共享 Windows">无线网络共享 Windows<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hexo-github/" title="Hexo github">Hexo github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JavaScript-闭包-ExtJS/" title="JavaScript 闭包 ExtJS">JavaScript 闭包 ExtJS<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><a href="http://leorz.com" target="_blank" title="Leo">Leo's Blog</a></li>
+      <li><a href="http://hexo.io" target="_blank" title="Hexo">Hexo</a></li>
+    </ul>
+</div>
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2016 
+		
+		<a href="http://elvin.im/about" target="_blank" title="Elvin Guan">Elvin Guan</a>
+		
+		</p>
+</div>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F9cc4c1668f1879156c0627818f4e84ae' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"elvin-blog"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>
