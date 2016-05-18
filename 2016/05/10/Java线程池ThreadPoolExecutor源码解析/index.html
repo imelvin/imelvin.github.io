@@ -13,7 +13,8 @@
 接口
 首先我们看线程池实现的接口。
 Executor接口
-该接口的方法是线程池常用的一个方法。一般来说，线程池需要将任务封装成Runnable对象来执行。该接口将任务与任务的执行策略去耦合，任务由由Runnable实现，而任务的执行策略由Executor的实现类负责。">
+该接口的方法是线程池常用的一个方法。一般来说，线程池需要将任务封装成Runnable对象来执行。该接口将任务与任务的执行策略去耦合，任务由Runnable实现，而任务的执行策略由Executor的实现类负责。
+">
     
     
     
@@ -99,7 +100,7 @@ Executor接口
 <h2 id="接口">接口</h2>
 <p>首先我们看线程池实现的接口。</p>
 <h3 id="Executor接口">Executor接口</h3>
-<p>该接口的方法是线程池常用的一个方法。一般来说，线程池需要将任务封装成Runnable对象来执行。该接口将任务与任务的执行策略去耦合，任务由由Runnable实现，而任务的执行策略由Executor的实现类负责。</p>
+<p>该接口的方法是线程池常用的一个方法。一般来说，线程池需要将任务封装成Runnable对象来执行。该接口将任务与任务的执行策略去耦合，任务由Runnable实现，而任务的执行策略由Executor的实现类负责。</p>
 <p>如果直接使用线程，就需要自己处理任务的调度，执行等等。为了重用这些策略，我们可以将这些策略封装成Executor对象。</p>
 <figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Executor</span> </span>{</div><div class="line"></div><div class="line">    <span class="keyword">void</span> execute(Runnable command);</div><div class="line">}</div></pre></td></tr></table></figure>
 
