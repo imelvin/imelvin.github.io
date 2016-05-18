@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://elvin.im/2016/05/10/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0ThreadPoolExecutor%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</loc>
+    <lastmod>2016-05-18T13:26:19.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://elvin.im/2016/04/17/java-util-concurrent-ConcurrentHashMap%E5%8E%9F%E7%90%86%E7%A0%94%E7%A9%B6/</loc>
     <lastmod>2016-05-18T04:21:59.000Z</lastmod>
   </url>
