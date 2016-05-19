@@ -1,0 +1,578 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>java.concurrent包简单介绍 | Elvin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Elvin Guan">
+    
+    <meta name="description" content="java.concurrent包有两个子包：locks和atomic，我们先介绍子包的类。本文代码基于JDK 1.7源码。
+java.util.concurrent.locks包
+Lock接口
+在Java 1.5以前，要给一个代码块或者方法加锁，只能通过synchronized关键字。自从1.5开始">
+    
+    
+    
+    
+    <link rel="alternative" href="/atom.xml" title="Elvin Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Elvin Blog" title="Elvin Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Elvin Blog">Elvin Blog</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:elvin.im">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/13/java-concurrent包简单介绍/" title="java.concurrent包简单介绍" itemprop="url">java.concurrent包简单介绍</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="http://elvin.im/about" title="Elvin Guan" target="_blank" itemprop="author">Elvin Guan</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-13T14:29:25.000Z" itemprop="datePublished"> 发表于 5月 13 2016</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#java-util-concurrent-locks包"><span class="toc-number">1.</span> <span class="toc-text">java.util.concurrent.locks包</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Lock接口"><span class="toc-number">1.1.</span> <span class="toc-text">Lock接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Condition接口"><span class="toc-number">1.2.</span> <span class="toc-text">Condition接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ReadWriteLock接口"><span class="toc-number">1.3.</span> <span class="toc-text">ReadWriteLock接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LockSupport类"><span class="toc-number">1.4.</span> <span class="toc-text">LockSupport类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AbstractQueuedSynchronizer、AbstractQueuedLongSynchronizer和AbstractOwnableSynchronizer类"><span class="toc-number">1.5.</span> <span class="toc-text">AbstractQueuedSynchronizer、AbstractQueuedLongSynchronizer和AbstractOwnableSynchronizer类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ReentrantLock类"><span class="toc-number">1.6.</span> <span class="toc-text">ReentrantLock类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ReentrantReadWriteLock类"><span class="toc-number">1.7.</span> <span class="toc-text">ReentrantReadWriteLock类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#java-util-concurrent-atomic包"><span class="toc-number">2.</span> <span class="toc-text">java.util.concurrent.atomic包</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicBoolean类"><span class="toc-number">2.1.</span> <span class="toc-text">AtomicBoolean类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicInteger类"><span class="toc-number">2.2.</span> <span class="toc-text">AtomicInteger类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicLong类"><span class="toc-number">2.3.</span> <span class="toc-text">AtomicLong类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicReference类"><span class="toc-number">2.4.</span> <span class="toc-text">AtomicReference类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicIntegerArray类"><span class="toc-number">2.5.</span> <span class="toc-text">AtomicIntegerArray类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicLongArray类"><span class="toc-number">2.6.</span> <span class="toc-text">AtomicLongArray类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicReferenceArray类"><span class="toc-number">2.7.</span> <span class="toc-text">AtomicReferenceArray类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicIntegerFieldUpdater类"><span class="toc-number">2.8.</span> <span class="toc-text">AtomicIntegerFieldUpdater类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicLongFieldUpdater类"><span class="toc-number">2.9.</span> <span class="toc-text">AtomicLongFieldUpdater类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicReferenceFieldUpdater类"><span class="toc-number">2.10.</span> <span class="toc-text">AtomicReferenceFieldUpdater类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicMarkableReference类"><span class="toc-number">2.11.</span> <span class="toc-text">AtomicMarkableReference类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicStampedReference类"><span class="toc-number">2.12.</span> <span class="toc-text">AtomicStampedReference类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#java-concurrent包"><span class="toc-number">3.</span> <span class="toc-text">java.concurrent包</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#接口"><span class="toc-number">3.1.</span> <span class="toc-text">接口</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#BlockingQueue接口"><span class="toc-number">3.1.1.</span> <span class="toc-text">BlockingQueue接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BlockingDeque接口"><span class="toc-number">3.1.2.</span> <span class="toc-text">BlockingDeque接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TransferQueue接口"><span class="toc-number">3.1.3.</span> <span class="toc-text">TransferQueue接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Callable接口"><span class="toc-number">3.1.4.</span> <span class="toc-text">Callable接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CompletionService接口"><span class="toc-number">3.1.5.</span> <span class="toc-text">CompletionService接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ConcurrentMap接口"><span class="toc-number">3.1.6.</span> <span class="toc-text">ConcurrentMap接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Executor接口"><span class="toc-number">3.1.7.</span> <span class="toc-text">Executor接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ExecutorService接口"><span class="toc-number">3.1.8.</span> <span class="toc-text">ExecutorService接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Future接口"><span class="toc-number">3.1.9.</span> <span class="toc-text">Future接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RunnableFuture接口"><span class="toc-number">3.1.10.</span> <span class="toc-text">RunnableFuture接口</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#并发容器"><span class="toc-number">3.2.</span> <span class="toc-text">并发容器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ArrayBlockingQueue类"><span class="toc-number">3.2.1.</span> <span class="toc-text">ArrayBlockingQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LinkedBlockingQueue类"><span class="toc-number">3.2.2.</span> <span class="toc-text">LinkedBlockingQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PriorityBlockingQueue类"><span class="toc-number">3.2.3.</span> <span class="toc-text">PriorityBlockingQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DelayQueue类"><span class="toc-number">3.2.4.</span> <span class="toc-text">DelayQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LinkedTransferQueue类"><span class="toc-number">3.2.5.</span> <span class="toc-text">LinkedTransferQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ConcurrentLinkedQueue类"><span class="toc-number">3.2.6.</span> <span class="toc-text">ConcurrentLinkedQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ConcurrentLinkedDeque类"><span class="toc-number">3.2.7.</span> <span class="toc-text">ConcurrentLinkedDeque类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ConcurrentHashMap类"><span class="toc-number">3.2.8.</span> <span class="toc-text">ConcurrentHashMap类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CopyOnWriteArrayList类"><span class="toc-number">3.2.9.</span> <span class="toc-text">CopyOnWriteArrayList类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CopyOnWriteArraySet类"><span class="toc-number">3.2.10.</span> <span class="toc-text">CopyOnWriteArraySet类</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#同步器"><span class="toc-number">3.3.</span> <span class="toc-text">同步器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Semaphore类"><span class="toc-number">3.3.1.</span> <span class="toc-text">Semaphore类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CountDownLatch类"><span class="toc-number">3.3.2.</span> <span class="toc-text">CountDownLatch类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CyclicBarrier类"><span class="toc-number">3.3.3.</span> <span class="toc-text">CyclicBarrier类</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#并行框架"><span class="toc-number">3.4.</span> <span class="toc-text">并行框架</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ThreadPoolExecutor类"><span class="toc-number">3.4.1.</span> <span class="toc-text">ThreadPoolExecutor类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ForkJoinPool类"><span class="toc-number">3.4.2.</span> <span class="toc-text">ForkJoinPool类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ScheduledThreadPoolExecutor类"><span class="toc-number">3.4.3.</span> <span class="toc-text">ScheduledThreadPoolExecutor类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ExecutorCompletionService类"><span class="toc-number">3.4.4.</span> <span class="toc-text">ExecutorCompletionService类</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+		
+		</div>
+		
+		<p>java.concurrent包有两个子包：locks和atomic，我们先介绍子包的类。本文代码基于JDK 1.7源码。</p>
+<h2 id="java-util-concurrent-locks包">java.util.concurrent.locks包</h2>
+<h3 id="Lock接口">Lock接口</h3>
+<p>在Java 1.5以前，要给一个代码块或者方法加锁，只能通过synchronized关键字。自从1.5开始，Java提供了Lock接口和一系列实现，可以实现更复杂的锁机制。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Lock</span> </span>{</div><div class="line">    </div><div class="line">    <span class="comment">// 等待直到获取到锁</span></div><div class="line">    <span class="keyword">void</span> lock();</div><div class="line">    </div><div class="line">    <span class="comment">// 与lock方法类似，但是该方法会响应中断</span></div><div class="line">    <span class="keyword">void</span> lockInterruptibly() <span class="keyword">throws</span> InterruptedException;</div><div class="line">    </div><div class="line">    <span class="comment">// 尝试获取锁，不管是否成功都立即返回</span></div><div class="line">    <span class="keyword">boolean</span> tryLock();</div><div class="line">    </div><div class="line">    <span class="comment">// 尝试获取锁，并等待一段时间，而且在这期间会响应中断</span></div><div class="line">    <span class="keyword">boolean</span> tryLock(<span class="keyword">long</span> time, TimeUnit unit) <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    <span class="comment">// 释放锁</span></div><div class="line">    <span class="keyword">void</span> unlock();</div><div class="line">    </div><div class="line">    <span class="comment">// 在该锁上创建一个条件对象</span></div><div class="line">    Condition newCondition();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="Condition接口">Condition接口</h3>
+<p>Condition的对象是由Lock对象创建出来，Condition接口的方法类似于Object类上wait、signal、signalAll方法。Lock与Condition的关系类似于synchronized锁定的Object与Object类上wait、signal、signalAll方法之间的关系。Condition一定要在对应的Lock加锁以后才能使用。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Condition</span> </span>{</div><div class="line"></div><div class="line">    <span class="comment">// 阻塞当前线程直到被其他线程用signal或者signalAll方法唤醒，同时该方法可以响应中断</span></div><div class="line">    <span class="keyword">void</span> await() <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    <span class="comment">// 类似于await方法，但是不响应中断</span></div><div class="line">    <span class="keyword">void</span> awaitUninterruptibly();</div><div class="line"></div><div class="line">    <span class="comment">// 类似于await方法，但是只阻塞指定的时间</span></div><div class="line">    <span class="keyword">long</span> awaitNanos(<span class="keyword">long</span> nanosTimeout) <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    <span class="comment">// 类似于awaitNanos方法，只是时间可以用不同的单位</span></div><div class="line">    <span class="keyword">boolean</span> await(<span class="keyword">long</span> time, TimeUnit unit) <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    <span class="comment">// 类似于awaitNanos方法，但是不是阻塞固定的时间段，而是阻塞到某一个指定的时间</span></div><div class="line">    <span class="keyword">boolean</span> awaitUntil(Date deadline) <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    <span class="comment">// 唤醒一个在等待的线程</span></div><div class="line">    <span class="keyword">void</span> signal();</div><div class="line"></div><div class="line">    <span class="comment">// 唤醒所有在等待的线程</span></div><div class="line">    <span class="keyword">void</span> signalAll();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="ReadWriteLock接口">ReadWriteLock接口</h3>
+<p>读写锁接口</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ReadWriteLock</span> </span>{</div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * Returns the lock used for reading.</div><div class="line">     *</div><div class="line">     *<span class="javadoctag"> @return</span> the lock used for reading.</div><div class="line">     */</div><div class="line">    Lock readLock();</div><div class="line"></div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * Returns the lock used for writing.</div><div class="line">     *</div><div class="line">     *<span class="javadoctag"> @return</span> the lock used for writing.</div><div class="line">     */</div><div class="line">    Lock writeLock();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="LockSupport类">LockSupport类</h3>
+<p>该类为创建锁和其他同步类提供了阻塞原语。LockSupport只是sun.misc.Unsafe的一个简单封装。该类提供了阻塞线程、唤醒线程的一系列方法，Lock和Condition的实现很多都需要使用到该类。</p>
+<h3 id="AbstractQueuedSynchronizer、AbstractQueuedLongSynchronizer和AbstractOwnableSynchronizer类">AbstractQueuedSynchronizer、AbstractQueuedLongSynchronizer和AbstractOwnableSynchronizer类</h3>
+<p>我们很少会直接使用LockSupport去构建自己的同步器，而是使用AQS也就是AbstractQueuedSynchronizer去构建。比如Semaphore、CountDownLatch等同步器就是在AbstractQueuedSynchronizer构建。在AbstractQueuedSynchronizer基础上构建自己的同步器会大大降低复杂度。</p>
+<p>AbstractQueuedSynchronizer内部通过一个整形变量来表示状态，而AbstractQueuedLongSynchronizer的区别是该状态用的是长整形。</p>
+<h3 id="ReentrantLock类">ReentrantLock类</h3>
+<p>该类应该是用的最多的锁，用来替换synchronized关键字。该类是Lock接口的一个实现，内部使用AbstractQueuedSynchronizer控制状态。</p>
+<h3 id="ReentrantReadWriteLock类">ReentrantReadWriteLock类</h3>
+<p>该类是读写锁接口的一个实现，可以分别获取读锁和写锁。同一时间可以有多个读线程，但是最多只能有一个写线程，而且写线程会阻塞读线程。很明显，这种锁适用于读操作远多于写操作的场景。</p>
+<h2 id="java-util-concurrent-atomic包">java.util.concurrent.atomic包</h2>
+<p>该包是一些使用CAS封装的基础数据类型，这些类都提供了CAS操作。</p>
+<h3 id="AtomicBoolean类">AtomicBoolean类</h3>
+<p>原子布尔型</p>
+<h3 id="AtomicInteger类">AtomicInteger类</h3>
+<p>原子整型</p>
+<h3 id="AtomicLong类">AtomicLong类</h3>
+<p>原子长整型</p>
+<h3 id="AtomicReference类">AtomicReference类</h3>
+<p>原子引用类型</p>
+<h3 id="AtomicIntegerArray类">AtomicIntegerArray类</h3>
+<p>原子的整型数组</p>
+<h3 id="AtomicLongArray类">AtomicLongArray类</h3>
+<p>原子的长整型数组</p>
+<h3 id="AtomicReferenceArray类">AtomicReferenceArray类</h3>
+<p>原子的引用数组</p>
+<h3 id="AtomicIntegerFieldUpdater类">AtomicIntegerFieldUpdater类</h3>
+<p>该类可以为某个类的volatile int字段提供原子更新器，提供CAS操作</p>
+<h3 id="AtomicLongFieldUpdater类">AtomicLongFieldUpdater类</h3>
+<p>该类可以为某个类的volatile long字段提供原子更新器，提供CAS操作</p>
+<h3 id="AtomicReferenceFieldUpdater类">AtomicReferenceFieldUpdater类</h3>
+<p>该类可以为某个类的volatile的引用字段提供原子更新器，提供CAS操作</p>
+<h3 id="AtomicMarkableReference类">AtomicMarkableReference类</h3>
+<p>原子的引用类型，但是带一个boolean的mark字段，mark字段与引用捆绑在一起提供原子操作。</p>
+<h3 id="AtomicStampedReference类">AtomicStampedReference类</h3>
+<p>与AtomicMarkableReference类似，只是mark字段换为了一个int类型的stamp字段。</p>
+<h2 id="java-concurrent包">java.concurrent包</h2>
+<p>该包提供了一系列常用的同步器和一些高性能的容器，还有线程池，首先介绍这个包下的几个接口</p>
+<h3 id="接口">接口</h3>
+<h4 id="BlockingQueue接口">BlockingQueue接口</h4>
+<p>BlockingQueue集成了Queue接口，首先它是一个队列，然后它是一个阻塞队列。阻塞队列在生产者-消费者模型可以很好的降低实现复杂度。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BlockingQueue</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">Queue</span>&lt;<span class="title">E</span>&gt; </span>{</div><div class="line">    </div><div class="line">    <span class="keyword">boolean</span> add(E e);</div><div class="line">    </div><div class="line">    <span class="keyword">boolean</span> offer(E e);</div><div class="line">    </div><div class="line">    <span class="keyword">void</span> put(E e) <span class="keyword">throws</span> InterruptedException;</div><div class="line">    </div><div class="line">    <span class="keyword">boolean</span> offer(E e, <span class="keyword">long</span> timeout, TimeUnit unit)</div><div class="line">        <span class="keyword">throws</span> InterruptedException;</div><div class="line">    </div><div class="line">    E take() <span class="keyword">throws</span> InterruptedException;</div><div class="line">    </div><div class="line">    E poll(<span class="keyword">long</span> timeout, TimeUnit unit)</div><div class="line">        <span class="keyword">throws</span> InterruptedException;</div><div class="line">    </div><div class="line">    <span class="keyword">int</span> remainingCapacity();</div><div class="line">    </div><div class="line">    <span class="keyword">boolean</span> remove(Object o);</div><div class="line">    </div><div class="line">    <span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span>(Object o);</div><div class="line">    </div><div class="line">    <span class="keyword">int</span> drainTo(Collection&lt;? <span class="keyword">super</span> E&gt; c);</div><div class="line">    </div><div class="line">    <span class="keyword">int</span> drainTo(Collection&lt;? <span class="keyword">super</span> E&gt; c, <span class="keyword">int</span> maxElements);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="BlockingDeque接口">BlockingDeque接口</h4>
+<p>BlockingDeque是一个双端阻塞队列。</p>
+<h4 id="TransferQueue接口">TransferQueue接口</h4>
+<p>该接口扩展了BlockingQueue，但是该接口还提供了transfer方法，在添加元素时可以让生产者等待直到有消费者取走该元素。</p>
+<h4 id="Callable接口">Callable接口</h4>
+<p>该接口可看做Runnable接口的一个扩展，但是有返回值</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>{</div><div class="line"></div><div class="line">    V call() <span class="keyword">throws</span> Exception;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="CompletionService接口">CompletionService接口</h4>
+<p>类似于线程池，但是这个接口的实现都会返回Future对象。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CompletionService</span>&lt;<span class="title">V</span>&gt; </span>{</div><div class="line">    </div><div class="line">    Future&lt;V&gt; submit(Callable&lt;V&gt; task);</div><div class="line"></div><div class="line">    Future&lt;V&gt; submit(Runnable task, V result);</div><div class="line"></div><div class="line">    Future&lt;V&gt; take() <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    Future&lt;V&gt; poll();</div><div class="line"></div><div class="line">    Future&lt;V&gt; poll(<span class="keyword">long</span> timeout, TimeUnit unit) <span class="keyword">throws</span> InterruptedException;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="ConcurrentMap接口">ConcurrentMap接口</h4>
+<p>该接口扩展了Map接口，新增了putIfAbsent、remove、replace这些原子操作接口</p>
+<h4 id="Executor接口">Executor接口</h4>
+<p>该接口代表一个执行器，执行一个Runnable对象，但是并不限制用同步实现还是异步实现。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Executor</span> </span>{</div><div class="line"></div><div class="line">    <span class="keyword">void</span> execute(Runnable command);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="ExecutorService接口">ExecutorService接口</h4>
+<p>该接口扩展了Executor接口，代表一个执行器服务，提供了更多关于ExecutorService生命周期管理的方法。一个典型实现就是ThreadPoolExecutor。</p>
+<h4 id="Future接口">Future接口</h4>
+<p>该接口代表了一个异步任务的执行结果。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Future</span>&lt;<span class="title">V</span>&gt; </span>{</div><div class="line"></div><div class="line">    <span class="comment">// 尝试取消该任务</span></div><div class="line">    <span class="keyword">boolean</span> cancel(<span class="keyword">boolean</span> mayInterruptIfRunning);</div><div class="line"></div><div class="line">    <span class="comment">// 判断该任务是否已经取消</span></div><div class="line">    <span class="keyword">boolean</span> isCancelled();</div><div class="line"></div><div class="line">    <span class="comment">// 判断该任务是否已经完成</span></div><div class="line">    <span class="keyword">boolean</span> isDone();</div><div class="line"></div><div class="line">    <span class="comment">// 阻塞获取执行结果，执行的异常会封装成ExecutionException抛出，而且该方法会响应中断</span></div><div class="line">    V get() <span class="keyword">throws</span> InterruptedException, ExecutionException;</div><div class="line"></div><div class="line">    <span class="comment">// 与get()方法类似，但是只会等待一定的时间</span></div><div class="line">    V get(<span class="keyword">long</span> timeout, TimeUnit unit)</div><div class="line">        <span class="keyword">throws</span> InterruptedException, ExecutionException, TimeoutException;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="RunnableFuture接口">RunnableFuture接口</h4>
+<p>RunnableFuture接口将Runnable接口与Future接口结合起来，Future代表着run的结果</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">RunnableFuture</span>&lt;<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">Runnable</span>, <span class="title">Future</span>&lt;<span class="title">V</span>&gt; </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">void</span> run();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>下面介绍一些常用的实现类</p>
+<h3 id="并发容器">并发容器</h3>
+<h4 id="ArrayBlockingQueue类">ArrayBlockingQueue类</h4>
+<p>基于数组实现的一个固定大小FIFO的阻塞队列，用以实现有界缓存是一个很好的选择。</p>
+<h4 id="LinkedBlockingQueue类">LinkedBlockingQueue类</h4>
+<p>基于链表实现的一个FIFO的阻塞队列，也可以指定容量，不指定的话，队列容量为Integer.MAX_VALUE。</p>
+<h4 id="PriorityBlockingQueue类">PriorityBlockingQueue类</h4>
+<p>带优先级的阻塞队列，依赖于Comparable接口方法。底层数据结构是一个存储在数组上的平衡二叉树。</p>
+<h4 id="DelayQueue类">DelayQueue类</h4>
+<p>一个接受Delayed对象的阻塞队列，一个元素只有延迟一定时间后才能被消费者获取。</p>
+<h4 id="LinkedTransferQueue类">LinkedTransferQueue类</h4>
+<p>这是TransferQueue的一个实现，通过链表实现</p>
+<h4 id="ConcurrentLinkedQueue类">ConcurrentLinkedQueue类</h4>
+<p>这是一个Queue而不是BlockingQueue，基于链表实现。采用CAS实现，没有加锁，所以多线程下效率很高。</p>
+<h4 id="ConcurrentLinkedDeque类">ConcurrentLinkedDeque类</h4>
+<p>类似ConcurrentLinkedQueue，区别是这是一个双端队列。</p>
+<h4 id="ConcurrentHashMap类">ConcurrentHashMap类</h4>
+<p>优化过的线程安全的HashMap，采用了锁分段技术，而且读的时候不会加锁，并发性能好。</p>
+<h4 id="CopyOnWriteArrayList类">CopyOnWriteArrayList类</h4>
+<p>使用了CopyOnWrite技术实现的ArrayList，读时不用加锁，所以在读操作远多于写操作的并发场景应该使用该类。</p>
+<h4 id="CopyOnWriteArraySet类">CopyOnWriteArraySet类</h4>
+<p>该集合类基于CopyOnWriteArrayList实现</p>
+<h3 id="同步器">同步器</h3>
+<h4 id="Semaphore类">Semaphore类</h4>
+<p>信号量，基于QAS实现，类似于锁，但是可以控制进入临界区的线程数量</p>
+<h4 id="CountDownLatch类">CountDownLatch类</h4>
+<p>闭锁，基于AQS实现。可以让一个或多个线程等待直到一些特定的事件发生。</p>
+<h4 id="CyclicBarrier类">CyclicBarrier类</h4>
+<p>栅栏，基于Condition实现。让一定数量的线程互相等待到达一个共同的栅栏位置。</p>
+<h3 id="并行框架">并行框架</h3>
+<h4 id="ThreadPoolExecutor类">ThreadPoolExecutor类</h4>
+<p>这是用的最多的一个线程池类。</p>
+<h4 id="ForkJoinPool类">ForkJoinPool类</h4>
+<p>这是从1.7开始提供的Fork/Join框架，这是一个并行计算框架，典型的应用应该是将递归算法改为并行计算，将计算拆分成多个计算单元。</p>
+<h4 id="ScheduledThreadPoolExecutor类">ScheduledThreadPoolExecutor类</h4>
+<p>类似于ThreadPoolExecutor，但是可以定时执行。</p>
+<h4 id="ExecutorCompletionService类">ExecutorCompletionService类</h4>
+<p>CompletionService的实现</p>
+<h2 id="总结">总结</h2>
+<p>在多线程编程时，应该根据场景尽量使用concurrent包中提供的工具，可以使程序的安全性和性能得到保证。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Java/">Java</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Java/">Java</a>
+  </div>
+
+</div>
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://elvin.im/2016/05/13/java-concurrent包简单介绍/" data-title="java.concurrent包简单介绍 | Elvin Blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/05/10/Java线程池ThreadPoolExecutor源码解析/"  title="Java线程池ThreadPoolExecutor源码解析">
+ <strong>下一篇：</strong><br/> 
+ <span>Java线程池ThreadPoolExecutor源码解析
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#java-util-concurrent-locks包"><span class="toc-number">1.</span> <span class="toc-text">java.util.concurrent.locks包</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Lock接口"><span class="toc-number">1.1.</span> <span class="toc-text">Lock接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Condition接口"><span class="toc-number">1.2.</span> <span class="toc-text">Condition接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ReadWriteLock接口"><span class="toc-number">1.3.</span> <span class="toc-text">ReadWriteLock接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LockSupport类"><span class="toc-number">1.4.</span> <span class="toc-text">LockSupport类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AbstractQueuedSynchronizer、AbstractQueuedLongSynchronizer和AbstractOwnableSynchronizer类"><span class="toc-number">1.5.</span> <span class="toc-text">AbstractQueuedSynchronizer、AbstractQueuedLongSynchronizer和AbstractOwnableSynchronizer类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ReentrantLock类"><span class="toc-number">1.6.</span> <span class="toc-text">ReentrantLock类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ReentrantReadWriteLock类"><span class="toc-number">1.7.</span> <span class="toc-text">ReentrantReadWriteLock类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#java-util-concurrent-atomic包"><span class="toc-number">2.</span> <span class="toc-text">java.util.concurrent.atomic包</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicBoolean类"><span class="toc-number">2.1.</span> <span class="toc-text">AtomicBoolean类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicInteger类"><span class="toc-number">2.2.</span> <span class="toc-text">AtomicInteger类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicLong类"><span class="toc-number">2.3.</span> <span class="toc-text">AtomicLong类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicReference类"><span class="toc-number">2.4.</span> <span class="toc-text">AtomicReference类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicIntegerArray类"><span class="toc-number">2.5.</span> <span class="toc-text">AtomicIntegerArray类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicLongArray类"><span class="toc-number">2.6.</span> <span class="toc-text">AtomicLongArray类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicReferenceArray类"><span class="toc-number">2.7.</span> <span class="toc-text">AtomicReferenceArray类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicIntegerFieldUpdater类"><span class="toc-number">2.8.</span> <span class="toc-text">AtomicIntegerFieldUpdater类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicLongFieldUpdater类"><span class="toc-number">2.9.</span> <span class="toc-text">AtomicLongFieldUpdater类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicReferenceFieldUpdater类"><span class="toc-number">2.10.</span> <span class="toc-text">AtomicReferenceFieldUpdater类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicMarkableReference类"><span class="toc-number">2.11.</span> <span class="toc-text">AtomicMarkableReference类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AtomicStampedReference类"><span class="toc-number">2.12.</span> <span class="toc-text">AtomicStampedReference类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#java-concurrent包"><span class="toc-number">3.</span> <span class="toc-text">java.concurrent包</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#接口"><span class="toc-number">3.1.</span> <span class="toc-text">接口</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#BlockingQueue接口"><span class="toc-number">3.1.1.</span> <span class="toc-text">BlockingQueue接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BlockingDeque接口"><span class="toc-number">3.1.2.</span> <span class="toc-text">BlockingDeque接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TransferQueue接口"><span class="toc-number">3.1.3.</span> <span class="toc-text">TransferQueue接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Callable接口"><span class="toc-number">3.1.4.</span> <span class="toc-text">Callable接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CompletionService接口"><span class="toc-number">3.1.5.</span> <span class="toc-text">CompletionService接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ConcurrentMap接口"><span class="toc-number">3.1.6.</span> <span class="toc-text">ConcurrentMap接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Executor接口"><span class="toc-number">3.1.7.</span> <span class="toc-text">Executor接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ExecutorService接口"><span class="toc-number">3.1.8.</span> <span class="toc-text">ExecutorService接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Future接口"><span class="toc-number">3.1.9.</span> <span class="toc-text">Future接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RunnableFuture接口"><span class="toc-number">3.1.10.</span> <span class="toc-text">RunnableFuture接口</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#并发容器"><span class="toc-number">3.2.</span> <span class="toc-text">并发容器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ArrayBlockingQueue类"><span class="toc-number">3.2.1.</span> <span class="toc-text">ArrayBlockingQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LinkedBlockingQueue类"><span class="toc-number">3.2.2.</span> <span class="toc-text">LinkedBlockingQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PriorityBlockingQueue类"><span class="toc-number">3.2.3.</span> <span class="toc-text">PriorityBlockingQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DelayQueue类"><span class="toc-number">3.2.4.</span> <span class="toc-text">DelayQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LinkedTransferQueue类"><span class="toc-number">3.2.5.</span> <span class="toc-text">LinkedTransferQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ConcurrentLinkedQueue类"><span class="toc-number">3.2.6.</span> <span class="toc-text">ConcurrentLinkedQueue类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ConcurrentLinkedDeque类"><span class="toc-number">3.2.7.</span> <span class="toc-text">ConcurrentLinkedDeque类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ConcurrentHashMap类"><span class="toc-number">3.2.8.</span> <span class="toc-text">ConcurrentHashMap类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CopyOnWriteArrayList类"><span class="toc-number">3.2.9.</span> <span class="toc-text">CopyOnWriteArrayList类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CopyOnWriteArraySet类"><span class="toc-number">3.2.10.</span> <span class="toc-text">CopyOnWriteArraySet类</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#同步器"><span class="toc-number">3.3.</span> <span class="toc-text">同步器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Semaphore类"><span class="toc-number">3.3.1.</span> <span class="toc-text">Semaphore类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CountDownLatch类"><span class="toc-number">3.3.2.</span> <span class="toc-text">CountDownLatch类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CyclicBarrier类"><span class="toc-number">3.3.3.</span> <span class="toc-text">CyclicBarrier类</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#并行框架"><span class="toc-number">3.4.</span> <span class="toc-text">并行框架</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ThreadPoolExecutor类"><span class="toc-number">3.4.1.</span> <span class="toc-text">ThreadPoolExecutor类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ForkJoinPool类"><span class="toc-number">3.4.2.</span> <span class="toc-text">ForkJoinPool类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ScheduledThreadPoolExecutor类"><span class="toc-number">3.4.3.</span> <span class="toc-text">ScheduledThreadPoolExecutor类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ExecutorCompletionService类"><span class="toc-number">3.4.4.</span> <span class="toc-text">ExecutorCompletionService类</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Java/" title="Java">Java<sup>7</sup></a></li>
+		
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>3</sup></a></li>
+		
+			<li><a href="/categories/Maven/" title="Maven">Maven<sup>1</sup></a></li>
+		
+			<li><a href="/categories/MySQL/" title="MySQL">MySQL<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Windows/" title="Windows">Windows<sup>1</sup></a></li>
+		
+			<li><a href="/categories/github/" title="github">github<sup>1</sup></a></li>
+		
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		
+			<li><a href="/categories/机器学习/" title="机器学习">机器学习<sup>1</sup></a></li>
+		
+			<li><a href="/categories/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/categories/算法实现/" title="算法实现">算法实现<sup>5</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Java-POI/" title="Java POI">Java POI<sup>2</sup></a></li>
+		
+			<li><a href="/tags/无线网络共享-Windows/" title="无线网络共享 Windows">无线网络共享 Windows<sup>1</sup></a></li>
+		
+			<li><a href="/tags/快速排序/" title="快速排序">快速排序<sup>1</sup></a></li>
+		
+			<li><a href="/tags/并查集/" title="并查集">并查集<sup>1</sup></a></li>
+		
+			<li><a href="/tags/寻找第k小元素/" title="寻找第k小元素">寻找第k小元素<sup>1</sup></a></li>
+		
+			<li><a href="/tags/寻找多数元素/" title="寻找多数元素">寻找多数元素<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hibernate-注入/" title="Hibernate 注入">Hibernate 注入<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hexo-github/" title="Hexo github">Hexo github<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Hadoop-Docker/" title="Hadoop Docker">Hadoop Docker<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Java-垃圾回收/" title="Java 垃圾回收">Java 垃圾回收<sup>1</sup></a></li>
+		
+			<li><a href="/tags/CentOS-Linux/" title="CentOS Linux">CentOS Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/MySQL-数据库-索引/" title="MySQL 数据库 索引">MySQL 数据库 索引<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Maven-Nexus/" title="Maven Nexus">Maven Nexus<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JavaScript-闭包-ExtJS/" title="JavaScript 闭包 ExtJS">JavaScript 闭包 ExtJS<sup>1</sup></a></li>
+		
+			<li><a href="/tags/浏览器兼容性/" title="浏览器兼容性">浏览器兼容性<sup>1</sup></a></li>
+		
+			<li><a href="/tags/HTML/" title="HTML">HTML<sup>1</sup></a></li>
+		
+			<li><a href="/tags/JS/" title="JS">JS<sup>1</sup></a></li>
+		
+			<li><a href="/tags/机器学习/" title="机器学习">机器学习<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><a href="http://lpbobo.com" target="_blank" title="Leo">LP's Blog</a></li>
+      <li><a href="http://hexo.io" target="_blank" title="Hexo">Hexo</a></li>
+    </ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Pacman">Jacman</a> © 2016 
+		
+		<a href="http://elvin.im/about" target="_blank" title="Elvin Guan">Elvin Guan</a>
+		
+		</p>
+</div>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F9cc4c1668f1879156c0627818f4e84ae' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"elvin-blog"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+
+
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<script src="/js/totop.js"></script>
+
+
+
+
+  </body>
+</html>

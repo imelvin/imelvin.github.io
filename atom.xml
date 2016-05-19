@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://elvin.im/"/>
-  <updated>2016-05-18T13:55:32.898Z</updated>
+  <updated>2016-05-19T14:32:41.641Z</updated>
   <id>http://elvin.im/</id>
   
   <author>
@@ -13,6 +13,149 @@
   </author>
   
   <generator uri="http://zespia.tw/hexo/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[java.concurrent包简单介绍]]></title>
+    <link href="http://elvin.im/2016/05/13/java-concurrent%E5%8C%85%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/"/>
+    <id>http://elvin.im/2016/05/13/java-concurrent包简单介绍/</id>
+    <published>2016-05-13T14:29:25.000Z</published>
+    <updated>2016-05-19T14:32:00.000Z</updated>
+    <content type="html"><![CDATA[<p>java.concurrent包有两个子包：locks和atomic，我们先介绍子包的类。本文代码基于JDK 1.7源码。</p>
+<h2 id="java-util-concurrent-locks包">java.util.concurrent.locks包</h2>
+<h3 id="Lock接口">Lock接口</h3>
+<p>在Java 1.5以前，要给一个代码块或者方法加锁，只能通过synchronized关键字。自从1.5开始，Java提供了Lock接口和一系列实现，可以实现更复杂的锁机制。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Lock</span> </span>{</div><div class="line">    </div><div class="line">    <span class="comment">// 等待直到获取到锁</span></div><div class="line">    <span class="keyword">void</span> lock();</div><div class="line">    </div><div class="line">    <span class="comment">// 与lock方法类似，但是该方法会响应中断</span></div><div class="line">    <span class="keyword">void</span> lockInterruptibly() <span class="keyword">throws</span> InterruptedException;</div><div class="line">    </div><div class="line">    <span class="comment">// 尝试获取锁，不管是否成功都立即返回</span></div><div class="line">    <span class="keyword">boolean</span> tryLock();</div><div class="line">    </div><div class="line">    <span class="comment">// 尝试获取锁，并等待一段时间，而且在这期间会响应中断</span></div><div class="line">    <span class="keyword">boolean</span> tryLock(<span class="keyword">long</span> time, TimeUnit unit) <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    <span class="comment">// 释放锁</span></div><div class="line">    <span class="keyword">void</span> unlock();</div><div class="line">    </div><div class="line">    <span class="comment">// 在该锁上创建一个条件对象</span></div><div class="line">    Condition newCondition();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="Condition接口">Condition接口</h3>
+<p>Condition的对象是由Lock对象创建出来，Condition接口的方法类似于Object类上wait、signal、signalAll方法。Lock与Condition的关系类似于synchronized锁定的Object与Object类上wait、signal、signalAll方法之间的关系。Condition一定要在对应的Lock加锁以后才能使用。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Condition</span> </span>{</div><div class="line"></div><div class="line">    <span class="comment">// 阻塞当前线程直到被其他线程用signal或者signalAll方法唤醒，同时该方法可以响应中断</span></div><div class="line">    <span class="keyword">void</span> await() <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    <span class="comment">// 类似于await方法，但是不响应中断</span></div><div class="line">    <span class="keyword">void</span> awaitUninterruptibly();</div><div class="line"></div><div class="line">    <span class="comment">// 类似于await方法，但是只阻塞指定的时间</span></div><div class="line">    <span class="keyword">long</span> awaitNanos(<span class="keyword">long</span> nanosTimeout) <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    <span class="comment">// 类似于awaitNanos方法，只是时间可以用不同的单位</span></div><div class="line">    <span class="keyword">boolean</span> await(<span class="keyword">long</span> time, TimeUnit unit) <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    <span class="comment">// 类似于awaitNanos方法，但是不是阻塞固定的时间段，而是阻塞到某一个指定的时间</span></div><div class="line">    <span class="keyword">boolean</span> awaitUntil(Date deadline) <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    <span class="comment">// 唤醒一个在等待的线程</span></div><div class="line">    <span class="keyword">void</span> signal();</div><div class="line"></div><div class="line">    <span class="comment">// 唤醒所有在等待的线程</span></div><div class="line">    <span class="keyword">void</span> signalAll();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="ReadWriteLock接口">ReadWriteLock接口</h3>
+<p>读写锁接口</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ReadWriteLock</span> </span>{</div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * Returns the lock used for reading.</div><div class="line">     *</div><div class="line">     *<span class="javadoctag"> @return</span> the lock used for reading.</div><div class="line">     */</div><div class="line">    Lock readLock();</div><div class="line"></div><div class="line">    <span class="javadoc">/**</span></div><div class="line">     * Returns the lock used for writing.</div><div class="line">     *</div><div class="line">     *<span class="javadoctag"> @return</span> the lock used for writing.</div><div class="line">     */</div><div class="line">    Lock writeLock();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="LockSupport类">LockSupport类</h3>
+<p>该类为创建锁和其他同步类提供了阻塞原语。LockSupport只是sun.misc.Unsafe的一个简单封装。该类提供了阻塞线程、唤醒线程的一系列方法，Lock和Condition的实现很多都需要使用到该类。</p>
+<h3 id="AbstractQueuedSynchronizer、AbstractQueuedLongSynchronizer和AbstractOwnableSynchronizer类">AbstractQueuedSynchronizer、AbstractQueuedLongSynchronizer和AbstractOwnableSynchronizer类</h3>
+<p>我们很少会直接使用LockSupport去构建自己的同步器，而是使用AQS也就是AbstractQueuedSynchronizer去构建。比如Semaphore、CountDownLatch等同步器就是在AbstractQueuedSynchronizer构建。在AbstractQueuedSynchronizer基础上构建自己的同步器会大大降低复杂度。</p>
+<p>AbstractQueuedSynchronizer内部通过一个整形变量来表示状态，而AbstractQueuedLongSynchronizer的区别是该状态用的是长整形。</p>
+<h3 id="ReentrantLock类">ReentrantLock类</h3>
+<p>该类应该是用的最多的锁，用来替换synchronized关键字。该类是Lock接口的一个实现，内部使用AbstractQueuedSynchronizer控制状态。</p>
+<h3 id="ReentrantReadWriteLock类">ReentrantReadWriteLock类</h3>
+<p>该类是读写锁接口的一个实现，可以分别获取读锁和写锁。同一时间可以有多个读线程，但是最多只能有一个写线程，而且写线程会阻塞读线程。很明显，这种锁适用于读操作远多于写操作的场景。</p>
+<h2 id="java-util-concurrent-atomic包">java.util.concurrent.atomic包</h2>
+<p>该包是一些使用CAS封装的基础数据类型，这些类都提供了CAS操作。</p>
+<h3 id="AtomicBoolean类">AtomicBoolean类</h3>
+<p>原子布尔型</p>
+<h3 id="AtomicInteger类">AtomicInteger类</h3>
+<p>原子整型</p>
+<h3 id="AtomicLong类">AtomicLong类</h3>
+<p>原子长整型</p>
+<h3 id="AtomicReference类">AtomicReference类</h3>
+<p>原子引用类型</p>
+<h3 id="AtomicIntegerArray类">AtomicIntegerArray类</h3>
+<p>原子的整型数组</p>
+<h3 id="AtomicLongArray类">AtomicLongArray类</h3>
+<p>原子的长整型数组</p>
+<h3 id="AtomicReferenceArray类">AtomicReferenceArray类</h3>
+<p>原子的引用数组</p>
+<h3 id="AtomicIntegerFieldUpdater类">AtomicIntegerFieldUpdater类</h3>
+<p>该类可以为某个类的volatile int字段提供原子更新器，提供CAS操作</p>
+<h3 id="AtomicLongFieldUpdater类">AtomicLongFieldUpdater类</h3>
+<p>该类可以为某个类的volatile long字段提供原子更新器，提供CAS操作</p>
+<h3 id="AtomicReferenceFieldUpdater类">AtomicReferenceFieldUpdater类</h3>
+<p>该类可以为某个类的volatile的引用字段提供原子更新器，提供CAS操作</p>
+<h3 id="AtomicMarkableReference类">AtomicMarkableReference类</h3>
+<p>原子的引用类型，但是带一个boolean的mark字段，mark字段与引用捆绑在一起提供原子操作。</p>
+<h3 id="AtomicStampedReference类">AtomicStampedReference类</h3>
+<p>与AtomicMarkableReference类似，只是mark字段换为了一个int类型的stamp字段。</p>
+<h2 id="java-concurrent包">java.concurrent包</h2>
+<p>该包提供了一系列常用的同步器和一些高性能的容器，还有线程池，首先介绍这个包下的几个接口</p>
+<h3 id="接口">接口</h3>
+<h4 id="BlockingQueue接口">BlockingQueue接口</h4>
+<p>BlockingQueue集成了Queue接口，首先它是一个队列，然后它是一个阻塞队列。阻塞队列在生产者-消费者模型可以很好的降低实现复杂度。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BlockingQueue</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">Queue</span>&lt;<span class="title">E</span>&gt; </span>{</div><div class="line">    </div><div class="line">    <span class="keyword">boolean</span> add(E e);</div><div class="line">    </div><div class="line">    <span class="keyword">boolean</span> offer(E e);</div><div class="line">    </div><div class="line">    <span class="keyword">void</span> put(E e) <span class="keyword">throws</span> InterruptedException;</div><div class="line">    </div><div class="line">    <span class="keyword">boolean</span> offer(E e, <span class="keyword">long</span> timeout, TimeUnit unit)</div><div class="line">        <span class="keyword">throws</span> InterruptedException;</div><div class="line">    </div><div class="line">    E take() <span class="keyword">throws</span> InterruptedException;</div><div class="line">    </div><div class="line">    E poll(<span class="keyword">long</span> timeout, TimeUnit unit)</div><div class="line">        <span class="keyword">throws</span> InterruptedException;</div><div class="line">    </div><div class="line">    <span class="keyword">int</span> remainingCapacity();</div><div class="line">    </div><div class="line">    <span class="keyword">boolean</span> remove(Object o);</div><div class="line">    </div><div class="line">    <span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span>(Object o);</div><div class="line">    </div><div class="line">    <span class="keyword">int</span> drainTo(Collection&lt;? <span class="keyword">super</span> E&gt; c);</div><div class="line">    </div><div class="line">    <span class="keyword">int</span> drainTo(Collection&lt;? <span class="keyword">super</span> E&gt; c, <span class="keyword">int</span> maxElements);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="BlockingDeque接口">BlockingDeque接口</h4>
+<p>BlockingDeque是一个双端阻塞队列。</p>
+<h4 id="TransferQueue接口">TransferQueue接口</h4>
+<p>该接口扩展了BlockingQueue，但是该接口还提供了transfer方法，在添加元素时可以让生产者等待直到有消费者取走该元素。</p>
+<h4 id="Callable接口">Callable接口</h4>
+<p>该接口可看做Runnable接口的一个扩展，但是有返回值</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>{</div><div class="line"></div><div class="line">    V call() <span class="keyword">throws</span> Exception;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="CompletionService接口">CompletionService接口</h4>
+<p>类似于线程池，但是这个接口的实现都会返回Future对象。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CompletionService</span>&lt;<span class="title">V</span>&gt; </span>{</div><div class="line">    </div><div class="line">    Future&lt;V&gt; submit(Callable&lt;V&gt; task);</div><div class="line"></div><div class="line">    Future&lt;V&gt; submit(Runnable task, V result);</div><div class="line"></div><div class="line">    Future&lt;V&gt; take() <span class="keyword">throws</span> InterruptedException;</div><div class="line"></div><div class="line">    Future&lt;V&gt; poll();</div><div class="line"></div><div class="line">    Future&lt;V&gt; poll(<span class="keyword">long</span> timeout, TimeUnit unit) <span class="keyword">throws</span> InterruptedException;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="ConcurrentMap接口">ConcurrentMap接口</h4>
+<p>该接口扩展了Map接口，新增了putIfAbsent、remove、replace这些原子操作接口</p>
+<h4 id="Executor接口">Executor接口</h4>
+<p>该接口代表一个执行器，执行一个Runnable对象，但是并不限制用同步实现还是异步实现。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Executor</span> </span>{</div><div class="line"></div><div class="line">    <span class="keyword">void</span> execute(Runnable command);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="ExecutorService接口">ExecutorService接口</h4>
+<p>该接口扩展了Executor接口，代表一个执行器服务，提供了更多关于ExecutorService生命周期管理的方法。一个典型实现就是ThreadPoolExecutor。</p>
+<h4 id="Future接口">Future接口</h4>
+<p>该接口代表了一个异步任务的执行结果。</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Future</span>&lt;<span class="title">V</span>&gt; </span>{</div><div class="line"></div><div class="line">    <span class="comment">// 尝试取消该任务</span></div><div class="line">    <span class="keyword">boolean</span> cancel(<span class="keyword">boolean</span> mayInterruptIfRunning);</div><div class="line"></div><div class="line">    <span class="comment">// 判断该任务是否已经取消</span></div><div class="line">    <span class="keyword">boolean</span> isCancelled();</div><div class="line"></div><div class="line">    <span class="comment">// 判断该任务是否已经完成</span></div><div class="line">    <span class="keyword">boolean</span> isDone();</div><div class="line"></div><div class="line">    <span class="comment">// 阻塞获取执行结果，执行的异常会封装成ExecutionException抛出，而且该方法会响应中断</span></div><div class="line">    V get() <span class="keyword">throws</span> InterruptedException, ExecutionException;</div><div class="line"></div><div class="line">    <span class="comment">// 与get()方法类似，但是只会等待一定的时间</span></div><div class="line">    V get(<span class="keyword">long</span> timeout, TimeUnit unit)</div><div class="line">        <span class="keyword">throws</span> InterruptedException, ExecutionException, TimeoutException;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="RunnableFuture接口">RunnableFuture接口</h4>
+<p>RunnableFuture接口将Runnable接口与Future接口结合起来，Future代表着run的结果</p>
+<figure class="highlight Java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">RunnableFuture</span>&lt;<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">Runnable</span>, <span class="title">Future</span>&lt;<span class="title">V</span>&gt; </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">void</span> run();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>下面介绍一些常用的实现类</p>
+<h3 id="并发容器">并发容器</h3>
+<h4 id="ArrayBlockingQueue类">ArrayBlockingQueue类</h4>
+<p>基于数组实现的一个固定大小FIFO的阻塞队列，用以实现有界缓存是一个很好的选择。</p>
+<h4 id="LinkedBlockingQueue类">LinkedBlockingQueue类</h4>
+<p>基于链表实现的一个FIFO的阻塞队列，也可以指定容量，不指定的话，队列容量为Integer.MAX_VALUE。</p>
+<h4 id="PriorityBlockingQueue类">PriorityBlockingQueue类</h4>
+<p>带优先级的阻塞队列，依赖于Comparable接口方法。底层数据结构是一个存储在数组上的平衡二叉树。</p>
+<h4 id="DelayQueue类">DelayQueue类</h4>
+<p>一个接受Delayed对象的阻塞队列，一个元素只有延迟一定时间后才能被消费者获取。</p>
+<h4 id="LinkedTransferQueue类">LinkedTransferQueue类</h4>
+<p>这是TransferQueue的一个实现，通过链表实现</p>
+<h4 id="ConcurrentLinkedQueue类">ConcurrentLinkedQueue类</h4>
+<p>这是一个Queue而不是BlockingQueue，基于链表实现。采用CAS实现，没有加锁，所以多线程下效率很高。</p>
+<h4 id="ConcurrentLinkedDeque类">ConcurrentLinkedDeque类</h4>
+<p>类似ConcurrentLinkedQueue，区别是这是一个双端队列。</p>
+<h4 id="ConcurrentHashMap类">ConcurrentHashMap类</h4>
+<p>优化过的线程安全的HashMap，采用了锁分段技术，而且读的时候不会加锁，并发性能好。</p>
+<h4 id="CopyOnWriteArrayList类">CopyOnWriteArrayList类</h4>
+<p>使用了CopyOnWrite技术实现的ArrayList，读时不用加锁，所以在读操作远多于写操作的并发场景应该使用该类。</p>
+<h4 id="CopyOnWriteArraySet类">CopyOnWriteArraySet类</h4>
+<p>该集合类基于CopyOnWriteArrayList实现</p>
+<h3 id="同步器">同步器</h3>
+<h4 id="Semaphore类">Semaphore类</h4>
+<p>信号量，基于QAS实现，类似于锁，但是可以控制进入临界区的线程数量</p>
+<h4 id="CountDownLatch类">CountDownLatch类</h4>
+<p>闭锁，基于AQS实现。可以让一个或多个线程等待直到一些特定的事件发生。</p>
+<h4 id="CyclicBarrier类">CyclicBarrier类</h4>
+<p>栅栏，基于Condition实现。让一定数量的线程互相等待到达一个共同的栅栏位置。</p>
+<h3 id="并行框架">并行框架</h3>
+<h4 id="ThreadPoolExecutor类">ThreadPoolExecutor类</h4>
+<p>这是用的最多的一个线程池类。</p>
+<h4 id="ForkJoinPool类">ForkJoinPool类</h4>
+<p>这是从1.7开始提供的Fork/Join框架，这是一个并行计算框架，典型的应用应该是将递归算法改为并行计算，将计算拆分成多个计算单元。</p>
+<h4 id="ScheduledThreadPoolExecutor类">ScheduledThreadPoolExecutor类</h4>
+<p>类似于ThreadPoolExecutor，但是可以定时执行。</p>
+<h4 id="ExecutorCompletionService类">ExecutorCompletionService类</h4>
+<p>CompletionService的实现</p>
+<h2 id="总结">总结</h2>
+<p>在多线程编程时，应该根据场景尽量使用concurrent包中提供的工具，可以使程序的安全性和性能得到保证。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>java.concurrent包有两个子包：locks和atomic，我们先介绍子包的类。本文代码基于JDK 1.7源码。</p>
+<h2 id="java-util-concurrent-locks包">java.util.concurrent.locks包</h2>
+<]]>
+    </summary>
+    
+      <category term="Java" scheme="http://elvin.im/tags/Java/"/>
+    
+      <category term="Java" scheme="http://elvin.im/categories/Java/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[Java线程池ThreadPoolExecutor源码解析]]></title>
@@ -1760,52 +1903,6 @@
       <category term="JavaScript 闭包 ExtJS" scheme="http://elvin.im/tags/JavaScript-%E9%97%AD%E5%8C%85-ExtJS/"/>
     
       <category term="JavaScript" scheme="http://elvin.im/categories/JavaScript/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[IE下textfield粘贴内容中的换行符]]></title>
-    <link href="http://elvin.im/2014/10/22/IE%E4%B8%8Btextfield%E7%B2%98%E8%B4%B4%E5%86%85%E5%AE%B9%E4%B8%AD%E7%9A%84%E6%8D%A2%E8%A1%8C%E7%AC%A6/"/>
-    <id>http://elvin.im/2014/10/22/IE下textfield粘贴内容中的换行符/</id>
-    <published>2014-10-22T12:54:53.000Z</published>
-    <updated>2014-10-23T14:04:06.000Z</updated>
-    <content type="html"><![CDATA[<p>对于将含有换行符的数据粘贴到单行的text输入框，不同浏览器有不同的行为。<br>待粘贴内容，也就是测试源码日下</p>
-<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">id</span>=<span class="value">"testText"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
-
-<h2 id="不同浏览器的不同行为">不同浏览器的不同行为</h2>
-<h3 id="在Chrome下">在Chrome下</h3>
-<p><img src="http://ww1.sinaimg.cn/large/79c63b39gw1eeu1jyeuz4j205k02sa9x.jpg" alt=""></p>
-<p>再复制出来的结果如下</p>
-<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span> <span class="tag">&lt;<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span> <span class="tag">&lt;/<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">body</span>&gt;</span> <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> /&gt;</span> <span class="tag">&lt;/<span class="title">body</span>&gt;</span> <span class="tag">&lt;/<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
-
-<p>可以发现换行变成了空格</p>
-<h3 id="在FireFox下">在FireFox下</h3>
-<p><img src="http://ww2.sinaimg.cn/large/79c63b39gw1eeu1ns594tj207503pt8q.jpg" alt=""></p>
-<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span> <span class="tag">&lt;<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">title</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">title</span>&gt;</span> <span class="tag">&lt;/<span class="title">head</span>&gt;</span> <span class="tag">&lt;<span class="title">body</span>&gt;</span> <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> /&gt;</span> <span class="tag">&lt;/<span class="title">body</span>&gt;</span> <span class="tag">&lt;/<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
-
-<p>可以发现FireFox与Chrome行为一致</p>
-<h3 id="在IE下">在IE下</h3>
-<p><img src="http://ww2.sinaimg.cn/large/79c63b39gw1eeu1sfkfhwj207u03rjr9.jpg" alt=""></p>
-<p>复制出来的结果如下</p>
-<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
-
-<p>可以发现只有第一行数据</p>
-<h2 id="解决方法">解决方法</h2>
-<figure class="highlight [JavaScript]"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (<span class="built_in">window</span>.clipboardData) {</div><div class="line">    $(<span class="string">'#testText'</span>).bind(<span class="string">'paste'</span>, <span class="function"><span class="keyword">function</span><span class="params">(e)</span> </span>{</div><div class="line">        <span class="keyword">var</span> clipped = <span class="built_in">window</span>.clipboardData.getData(<span class="string">"text"</span>);</div><div class="line"></div><div class="line">        clipped = clipped.replace(<span class="regexp">/(\r\n|\n|\r)/gm</span>, <span class="string">" "</span>); <span class="comment">//replace newlines with spaces</span></div><div class="line">        <span class="built_in">window</span>.clipboardData.setData(<span class="string">'text'</span>, clipped);</div><div class="line">    });</div><div class="line">}</div></pre></td></tr></table></figure>
-
-]]></content>
-    <summary type="html">
-    <![CDATA[<p>对于将含有换行符的数据粘贴到单行的text输入框，不同浏览器有不同的行为。<br>待粘贴内容，也就是测试源码日下</p>
-<figure class="highlight [html]"><table><tr><td class="gutter"><pre><div cla]]>
-    </summary>
-    
-      <category term="JS" scheme="http://elvin.im/tags/JS/"/>
-    
-      <category term="HTML" scheme="http://elvin.im/tags/HTML/"/>
-    
-      <category term="浏览器兼容性" scheme="http://elvin.im/tags/%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%BC%E5%AE%B9%E6%80%A7/"/>
-    
-      <category term="浏览器兼容性" scheme="http://elvin.im/categories/%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%BC%E5%AE%B9%E6%80%A7/"/>
     
   </entry>
   
